@@ -1,3 +1,5 @@
+const { BrowserRouter, Link, Switch, Route, browserHistory } = ReactRouterDOM;
+
 class ChatBox extends React.Component {
   render() {
     return (
@@ -55,12 +57,32 @@ class App extends React.Component {
   render() {
     console.log(this.state.random);
     return (
-      <div>
-        <h1> Cards Against Humanity </h1>
-        <Question questions={questions} random={this.state.randomQuestion} />
-        <Player answers={answers} random={this.state.randomAnswer} />
-        <ChatBox />
-      </div>
+      <BrowserRouter>
+        <div>
+          <h1> Cards Against Humanity </h1>
+          <Question questions={questions} random={this.state.randomQuestion} />
+          <Player answers={answers} random={this.state.randomAnswer} />
+          <ChatBox />
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/second">Second</Link>
+            </li>
+          </ul>
+          <hr />
+
+          <Switch>
+            <Route exact path="/">
+              <Home />
+            </Route>
+            <Route path="/second">
+              <Second />
+            </Route>
+          </Switch>
+        </div>
+      </BrowserRouter>
     );
   }
 }
