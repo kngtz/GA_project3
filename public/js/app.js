@@ -1,5 +1,3 @@
-// console.log(questions);
-// console.log(answers);
 const { BrowserRouter, Link, Switch, Route, browserHistory } = ReactRouterDOM;
 
 class ChatBox extends React.Component {
@@ -32,6 +30,16 @@ class Answer extends React.Component {
   }
 }
 
+class Player extends React.Component {
+  render() {
+    return (
+      <div>
+        <Answer answers={this.props.answers} random={this.props.random} />
+      </div>
+    );
+  }
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -53,7 +61,7 @@ class App extends React.Component {
         <div>
           <h1> Cards Against Humanity </h1>
           <Question questions={questions} random={this.state.randomQuestion} />
-          <Answer answers={answers} random={this.state.randomAnswer} />
+          <Player answers={answers} random={this.state.randomAnswer} />
           <ChatBox />
           <ul>
             <li>
