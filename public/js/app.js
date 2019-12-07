@@ -1,13 +1,48 @@
 // console.log(questions);
 // console.log(answers);
 
+class ChatBox extends React.Component {
+  render() {
+    return (
+      <div>
+        <h1>ChatBox Here</h1>
+      </div>
+    );
+  }
+}
+
+class Question extends React.Component {
+  render() {
+    return (
+      <div>
+        <h3>{this.props.questions[this.props.random]}</h3>
+      </div>
+    );
+  }
+}
+
+class Answer extends React.Component {
+  render() {
+    return (
+      <div>
+        <h3>{this.props.answers[this.props.random]}</h3>
+      </div>
+    );
+  }
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       questions: questions,
       answers: answers,
-      random: Math.floor(Math.random() * (questions.length - 0) + 0).toFixed()
+      randomQuestion: Math.floor(
+        Math.random() * (questions.length - 0) + 0
+      ).toFixed(),
+      randomAnswer: Math.floor(
+        Math.random() * (answers.length - 0) + 0
+      ).toFixed()
     };
   }
   render() {
@@ -15,8 +50,9 @@ class App extends React.Component {
     return (
       <div>
         <h1> Cards Against Humanity </h1>
-        {/* <button onClick={this.randomNumber.bind(this)}>Questions</button> */}
-        <h3>{this.state.questions[this.state.random]}</h3>
+        <Question questions={questions} random={this.state.randomQuestion} />
+        <Answer answers={answers} random={this.state.randomAnswer} />
+        <ChatBox />
       </div>
     );
   }
