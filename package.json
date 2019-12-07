@@ -1,23 +1,15 @@
 {
-  "name": "ga_project3",
+  "name": "instructor_examples",
   "version": "1.0.0",
-  "description": "Project 3",
+  "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kngtz/GA_project3.git"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/kngtz/GA_project3/issues"
-  },
-  "homepage": "https://github.com/kngtz/GA_project3#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.16.3",
+    "mongoose": "^5.2.3"
   }
 }
