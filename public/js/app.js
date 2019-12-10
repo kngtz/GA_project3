@@ -1,12 +1,17 @@
-// console.log(questions);
-// console.log(answers);
 const { BrowserRouter, Link, Switch, Route, browserHistory } = ReactRouterDOM;
+var socket = io();
+
+class Header extends React.Component {
+  render() {
+    return <h1> Cards Against Humanity </h1>;
+  }
+}
 
 class ChatBox extends React.Component {
   render() {
     return (
       <div>
-        <h1>ChatBox Here</h1>
+        <h3>ChatBox Here</h3>
       </div>
     );
   }
@@ -16,7 +21,8 @@ class Question extends React.Component {
   render() {
     return (
       <div>
-        <h3>{this.props.questions[this.props.random]}</h3>
+        <h3>Question: </h3>
+        <p>{this.props.questions[this.props.random]}</p>
       </div>
     );
   }
@@ -26,7 +32,17 @@ class Answer extends React.Component {
   render() {
     return (
       <div>
-        <h3>{this.props.answers[this.props.random]}</h3>
+        <p>{this.props.answers[this.props.random]}</p>
+      </div>
+    );
+  }
+}
+
+class Player extends React.Component {
+  render() {
+    return (
+      <div>
+        <Answer answers={this.props.answers} random={this.props.random} />
       </div>
     );
   }
@@ -50,11 +66,26 @@ class App extends React.Component {
     console.log(this.state.random);
     return (
       <BrowserRouter>
-        <div>
-          <h1> Cards Against Humanity </h1>
-          <Question questions={questions} random={this.state.randomQuestion} />
-          <Answer answers={answers} random={this.state.randomAnswer} />
-          <ChatBox />
+        <div class="container">
+          <div class="row">
+            <div class="col-12">
+              <Header />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-8">
+              <Question
+                questions={questions}
+                random={this.state.randomQuestion}
+              />
+              <Player answers={answers} random={this.state.randomAnswer} />
+            </div>
+
+            <div class="col-4">
+              <ChatBox />
+            </div>
+          </div>
+
           <ul>
             <li>
               <Link to="/">Home</Link>
