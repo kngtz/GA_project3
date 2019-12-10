@@ -5,7 +5,7 @@ const app = express();
 const db = mongoose.connection;
 const bodyParser = require("body-parser");
 require("dotenv").config();
-
+const Question = require("./models/questions");
 //require the http module
 const http = require("http").Server(app);
 
@@ -40,7 +40,7 @@ const todosController = require("./controllers/todos.js");
 app.use("/todos", todosController);
 
 app.get("/seedq", (req, res) => {
-  question.create(
+  Question.create(
     {
       description:
         "Action stations! Action stations! Set condition one throughout the fleet and brace for ______!"

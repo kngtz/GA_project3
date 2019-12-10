@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
-const questionsSchema = new mongoose.Schema({
+const questionSchema = new mongoose.Schema({
   description: String
 });
 
-const Questions = mongoose.model("Questions", questionSchema);
+const Question = mongoose.model("Question", questionSchema);
 
-module.exports = questions;
+module.exports = Question;
