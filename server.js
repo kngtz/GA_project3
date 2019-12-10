@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const app = express();
 const db = mongoose.connection;
 const bodyParser = require("body-parser");
+
 require("dotenv").config();
 
 //require the http module
@@ -33,7 +34,7 @@ app.use(bodyParser.json()); // bodyparser middleware
 app.use(express.static("public"));
 
 //integrating socketio
-socket = io(http);
+var socket = io(http);
 
 // Routes
 const todosController = require("./controllers/todos.js");
@@ -57,6 +58,10 @@ app.get("/seedq", (req, res) => {
       res.redirect("/");
     }
   );
+});
+
+socket.on("connection", function(socket) {
+  console.log("a user connected");
 });
 
 // this will catch any route that doesn't exist
