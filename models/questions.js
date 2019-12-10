@@ -6,4 +6,4 @@ const questionsSchema = new mongoose.Schema({
 
 const Questions = mongoose.model("Questions", questionSchema);
 
-module.exports = Questions;
+module.exports = questions;
