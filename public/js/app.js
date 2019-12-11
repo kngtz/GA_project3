@@ -15,7 +15,9 @@ class ChatBox extends React.Component {
     this.state = {
       username: "",
       message: "",
-      messages: []
+      messages: [],
+      question: "",
+      answer: ""
     };
   }
 
@@ -24,6 +26,12 @@ class ChatBox extends React.Component {
     console.log("socket:", this.socket);
     this.socket.on("RECEIVE_MESSAGE", data => {
       this.addMessage(data);
+    });
+    this.socket.on("QUESTION", question => {
+      this.setState({ question: question });
+    });
+    this.socket.on("ANSWER", answer => {
+      this.setState({ answer: answer });
     });
   }
 
@@ -42,6 +50,23 @@ class ChatBox extends React.Component {
     });
   };
 
+  joinGame = ev => {
+    ev.preventDefault();
+
+    this.socket.emit("JOIN_GAME", {
+      author: this.state.username,
+      message: this.state.message
+    });
+  };
+  answer = ev => {
+    ev.preventDefault();
+
+    this.socket.emit("ANSWER", {
+      author: this.state.username,
+      message: this.state.message
+    });
+  };
+
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
   };
@@ -54,7 +79,7 @@ class ChatBox extends React.Component {
             <div className="card">
               <div className="card-body">
                 <div className="card-title">
-                  Your username is {this.state.username}
+                  {this.state.question}:{this.state.answer}
                 </div>
                 <hr />
                 <div className="messages">
@@ -91,6 +116,18 @@ class ChatBox extends React.Component {
                   className="btn btn-primary form-control"
                 >
                   Send
+                </button>
+                <button
+                  onClick={this.joinGame}
+                  className="btn btn-primary form-control"
+                >
+                  Join Game
+                </button>
+                <button
+                  onClick={this.answer}
+                  className="btn btn-primary form-control"
+                >
+                  Answers
                 </button>
               </div>
             </div>
@@ -136,7 +173,6 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      gameroom: gameRoom,
       questions: questions,
       answers: answers,
       randomQuestion: Math.floor(
@@ -166,7 +202,7 @@ class App extends React.Component {
             </div>
 
             <div class="col-4">
-              <h1>{this.state.gameroom.Players[0].Cards[0]}</h1>
+              <h1></h1>
             </div>
           </div>
           <ChatBox />
