@@ -6,7 +6,6 @@ const db = mongoose.connection;
 const bodyParser = require("body-parser");
 
 require("dotenv").config();
-let numUsers = 0;
 
 var http = require("http").createServer(app);
 var io = require("socket.io")(http);
@@ -41,7 +40,9 @@ app.get("/", function(req, res) {
   res.sendFile(__dirname + "/index.html");
 });
 
-//integrating socketio
+//initialise variables
+let numUsers = 0;
+let userArray = [];
 
 // Routes
 const todosController = require("./controllers/todos.js");
@@ -80,8 +81,10 @@ app.get("*", (req, res) => {
 
 io.on("connection", function(socket) {
   numUsers++;
+  userArray.push(socket.id);
   console.log(socket.id + " connected");
   console.log("Users online : " + numUsers);
+  console.log("the array is" + userArray);
 
   io.clients((error, clients) => {
     if (error) throw error;
@@ -89,7 +92,8 @@ io.on("connection", function(socket) {
   });
   socket.on("SEND_MESSAGE", function(data) {
     console.log(socket.id + ": SENT MESSAGE - " + data);
-    io.emit("RECEIVE_MESSAGE", data);
+    console.log(userArray[3]);
+    io.to(userArray[3]).emit("RECEIVE_MESSAGE", data); // private messaging proof of concept
   });
   socket.on("disconnect", function() {
     numUsers--;

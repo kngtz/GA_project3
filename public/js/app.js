@@ -1,5 +1,5 @@
 const { BrowserRouter, Link, Switch, Route, browserHistory } = ReactRouterDOM;
-var socket = io();
+// var socket = io();
 // import io from "socket.io-client";
 
 class Header extends React.Component {
@@ -13,8 +13,8 @@ class ChatBox extends React.Component {
     super(props);
 
     this.state = {
-      username: "User",
-      message: "Message",
+      username: "",
+      message: "",
       messages: []
     };
   }
@@ -53,7 +53,9 @@ class ChatBox extends React.Component {
           <div className="col-4">
             <div className="card">
               <div className="card-body">
-                <div className="card-title">Global Chat</div>
+                <div className="card-title">
+                  Your username is {this.state.username}
+                </div>
                 <hr />
                 <div className="messages">
                   {this.state.messages.map(message => {
@@ -134,6 +136,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      gameroom: gameRoom,
       questions: questions,
       answers: answers,
       randomQuestion: Math.floor(
@@ -163,7 +166,7 @@ class App extends React.Component {
             </div>
 
             <div class="col-4">
-              <h1>Chatbox here</h1>
+              <h1>{this.state.gameroom.Players[0].Cards[0]}</h1>
             </div>
           </div>
           <ChatBox />
