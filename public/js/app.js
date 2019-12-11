@@ -13,8 +13,8 @@ class ChatBox extends React.Component {
     super(props);
 
     this.state = {
-      username: "",
-      message: "",
+      username: "User",
+      message: "Message",
       messages: []
     };
     this.socket = io("localhost:3000");
@@ -23,17 +23,21 @@ class ChatBox extends React.Component {
     });
 
     const addMessage = data => {
+      this.setState(state => {
+        return { username: "newU", message: "newM" };
+      });
       console.log(data);
       this.setState({ messages: [...this.state.messages, data] });
       console.log(this.state.messages);
     };
+
     this.sendMessage = ev => {
       ev.preventDefault();
+
       this.socket.emit("SEND_MESSAGE", {
         author: this.state.username,
         message: this.state.message
       });
-      this.setState({ message: "" });
     };
   }
   render() {
@@ -59,6 +63,7 @@ class ChatBox extends React.Component {
                 <input
                   type="text"
                   placeholder="Username"
+                  name="username"
                   className="form-control"
                 />
                 <br />
