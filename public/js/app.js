@@ -17,29 +17,35 @@ class ChatBox extends React.Component {
       message: "Message",
       messages: []
     };
-    this.socket = io("localhost:3000");
-    this.socket.on("RECEIVE_MESSAGE", function(data) {
-      addMessage(data);
-    });
-
-    const addMessage = data => {
-      this.setState(state => {
-        return { username: "newU", message: "newM" };
-      });
-      console.log(data);
-      this.setState({ messages: [...this.state.messages, data] });
-      console.log(this.state.messages);
-    };
-
-    this.sendMessage = ev => {
-      ev.preventDefault();
-
-      this.socket.emit("SEND_MESSAGE", {
-        author: this.state.username,
-        message: this.state.message
-      });
-    };
   }
+
+  componentDidMount() {
+    this.socket = io("localhost:3000");
+    console.log("socket:", this.socket);
+    this.socket.on("RECEIVE_MESSAGE", data => {
+      this.addMessage(data);
+    });
+  }
+
+  addMessage = data => {
+    console.log(data);
+    this.setState({ messages: [...this.state.messages, data] });
+    console.log(this.state.messages);
+  };
+
+  sendMessage = ev => {
+    ev.preventDefault();
+
+    this.socket.emit("SEND_MESSAGE", {
+      author: this.state.username,
+      message: this.state.message
+    });
+  };
+
+  handleChange = event => {
+    this.setState({ [event.target.name]: event.target.value });
+  };
+
   render() {
     return (
       <div className="container">
@@ -65,12 +71,17 @@ class ChatBox extends React.Component {
                   placeholder="Username"
                   name="username"
                   className="form-control"
+                  value={this.state.username}
+                  onChange={this.handleChange}
                 />
                 <br />
                 <input
                   type="text"
                   placeholder="Message"
+                  name="message"
                   className="form-control"
+                  value={this.state.message}
+                  onChange={this.handleChange}
                 />
                 <br />
                 <button

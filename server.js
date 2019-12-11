@@ -88,6 +88,7 @@ io.on("connection", function(socket) {
     console.log(clients);
   });
   socket.on("SEND_MESSAGE", function(data) {
+    console.log(socket.id + ": SENT MESSAGE - " + data);
     io.emit("RECEIVE_MESSAGE", data);
   });
   socket.on("disconnect", function() {
