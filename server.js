@@ -67,36 +67,49 @@ app.get("/seedq", (req, res) => {
   );
 });
 
-io.on("connection", function(socket) {
-  console.log("a user connected");
-});
-
 // this will catch any route that doesn't exist
 app.get("*", (req, res) => {
   res.status(404).json("Sorry, page not found");
 });
 
 // io.on("connection", function(socket) {
-//   numUsers++;
-//   console.log("Users online : " + numUsers);
-//   socket.on("disconnect", function() {
-//     numUsers--;
-//     console.log("Users online : " + numUsers);
+//   socket.on("chat message", function(msg) {
+//     io.emit("chat message", msg);
 //   });
 // });
 
-io.on("connection", socket => {
-  socket.join("room 237", () => {
-    numUsers++;
+io.on("connection", function(socket) {
+  numUsers++;
+  console.log(socket.id + " connected");
+  console.log("Users online : " + numUsers);
+
+  io.clients((error, clients) => {
+    if (error) throw error;
+    console.log(clients);
+  });
+  socket.on("SEND_MESSAGE", function(data) {
+    io.emit("RECEIVE_MESSAGE", data);
+  });
+  socket.on("disconnect", function() {
+    numUsers--;
+    console.log(socket.id + " disconnected");
     console.log("Users online : " + numUsers);
-    let rooms = Object.keys(socket.rooms);
-    console.log(rooms); // [ <socket.id>, 'room 237' ]
-    socket.on("disconnect", function() {
-      numUsers--;
-      console.log("Users online : " + numUsers);
-    });
   });
 });
+
+// io.on("connection", socket => {
+//   socket.join("room 237", () => {
+//     numUsers++;
+//     console.log("Users online : " + numUsers);
+//     let rooms = Object.keys(socket.rooms);
+//     console.log(rooms); // [ <socket.id>, 'room 237' ]
+//     socket.on("disconnect", function() {
+//       numUsers--;
+//       console.log("Users online : " + numUsers);
+//     });
+//   });
+// });
+
 // var numclients = io.sockets.adapter.rooms["room 237"];
 // console.log(numclients.length);
 
