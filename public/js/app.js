@@ -1,5 +1,5 @@
 const { BrowserRouter, Link, Switch, Route, browserHistory } = ReactRouterDOM;
-var socket = io();
+// var socket = io();
 // import io from "socket.io-client";
 
 class Header extends React.Component {
@@ -13,9 +13,11 @@ class ChatBox extends React.Component {
     super(props);
 
     this.state = {
-      username: "User",
-      message: "Message",
-      messages: []
+      username: "",
+      message: "",
+      messages: [],
+      question: "",
+      answer: ""
     };
   }
 
@@ -24,6 +26,12 @@ class ChatBox extends React.Component {
     console.log("socket:", this.socket);
     this.socket.on("RECEIVE_MESSAGE", data => {
       this.addMessage(data);
+    });
+    this.socket.on("QUESTION", question => {
+      this.setState({ question: question });
+    });
+    this.socket.on("ANSWER", answer => {
+      this.setState({ answer: answer });
     });
   }
 
@@ -42,6 +50,23 @@ class ChatBox extends React.Component {
     });
   };
 
+  joinGame = ev => {
+    ev.preventDefault();
+
+    this.socket.emit("JOIN_GAME", {
+      author: this.state.username,
+      message: this.state.message
+    });
+  };
+  answer = ev => {
+    ev.preventDefault();
+
+    this.socket.emit("ANSWER", {
+      author: this.state.username,
+      message: this.state.message
+    });
+  };
+
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
   };
@@ -53,7 +78,9 @@ class ChatBox extends React.Component {
           <div className="col-4">
             <div className="card">
               <div className="card-body">
-                <div className="card-title">Global Chat</div>
+                <div className="card-title">
+                  {this.state.question}:{this.state.answer}
+                </div>
                 <hr />
                 <div className="messages">
                   {this.state.messages.map(message => {
@@ -89,6 +116,18 @@ class ChatBox extends React.Component {
                   className="btn btn-primary form-control"
                 >
                   Send
+                </button>
+                <button
+                  onClick={this.joinGame}
+                  className="btn btn-primary form-control"
+                >
+                  Join Game
+                </button>
+                <button
+                  onClick={this.answer}
+                  className="btn btn-primary form-control"
+                >
+                  Answers
                 </button>
               </div>
             </div>
@@ -163,7 +202,7 @@ class App extends React.Component {
             </div>
 
             <div class="col-4">
-              <h1>Chatbox here</h1>
+              <h1></h1>
             </div>
           </div>
           <ChatBox />
