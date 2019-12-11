@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const app = express();
 const db = mongoose.connection;
 const bodyParser = require("body-parser");
+
 require("dotenv").config();
 let numUsers = 0;
 
@@ -41,7 +42,6 @@ app.get("/", function(req, res) {
 });
 
 //integrating socketio
-// socket = io(http);
 
 // Routes
 const todosController = require("./controllers/todos.js");
@@ -72,14 +72,47 @@ app.get("*", (req, res) => {
   res.status(404).json("Sorry, page not found");
 });
 
+// io.on("connection", function(socket) {
+//   socket.on("chat message", function(msg) {
+//     io.emit("chat message", msg);
+//   });
+// });
+
 io.on("connection", function(socket) {
   numUsers++;
+  console.log(socket.id + " connected");
   console.log("Users online : " + numUsers);
+
+  io.clients((error, clients) => {
+    if (error) throw error;
+    console.log(clients);
+  });
+  socket.on("SEND_MESSAGE", function(data) {
+    console.log(socket.id + ": SENT MESSAGE - " + data);
+    io.emit("RECEIVE_MESSAGE", data);
+  });
   socket.on("disconnect", function() {
     numUsers--;
+    console.log(socket.id + " disconnected");
     console.log("Users online : " + numUsers);
   });
 });
+
+// io.on("connection", socket => {
+//   socket.join("room 237", () => {
+//     numUsers++;
+//     console.log("Users online : " + numUsers);
+//     let rooms = Object.keys(socket.rooms);
+//     console.log(rooms); // [ <socket.id>, 'room 237' ]
+//     socket.on("disconnect", function() {
+//       numUsers--;
+//       console.log("Users online : " + numUsers);
+//     });
+//   });
+// });
+
+// var numclients = io.sockets.adapter.rooms["room 237"];
+// console.log(numclients.length);
 
 // app.listen(PORT, () => {
 //   console.log("Let's get things done on port", PORT);
