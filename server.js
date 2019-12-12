@@ -68,7 +68,7 @@ var gameRoom = {
     "Violating the First Law of Robotics."
   ]
 };
-
+var userCardArray = []; // push cards here to emit to user to give them their 7 cards.
 // Routes
 const todosController = require("./controllers/todos.js");
 app.use("/todos", todosController);
@@ -107,6 +107,7 @@ app.get("*", (req, res) => {
 io.on("connection", function(socket) {
   numUsers++;
   userArray.push(socket.id);
+
   console.log(socket.id + " connected");
   console.log("Users online : " + numUsers);
   console.log("the array is" + userArray);
@@ -117,7 +118,7 @@ io.on("connection", function(socket) {
   });
   socket.on("SEND_MESSAGE", function(data) {
     console.log(socket.id + ": SENT MESSAGE - " + data);
-    console.log(userArray[3]);
+
     io.emit("RECEIVE_MESSAGE", data);
     // io.to(userArray[3]).emit("RECEIVE_MESSAGE", data); // private messaging proof of concept
   });
@@ -125,9 +126,19 @@ io.on("connection", function(socket) {
     console.log(socket.id + ": JOIN GAME - " + data);
     io.emit("QUESTION", gameRoom.Questions[0]);
   });
+  socket.on("SEND_USERNAME", function(data) {
+    console.log(socket.id + ": SEND USERNAME - " + data.username);
+    socket.username = data.username;
+    console.log("socket username is " + socket.username);
+    socket.emit("USERNAME", data.username);
+  });
   socket.on("ANSWER", function(data) {
-    console.log(socket.id + ": ANSWER - " + data);
-    io.to(socket.id).emit("ANSWER", gameRoom.answers[0]);
+    console.log(socket.id + ": ANSWER - " + data.numCards);
+    for (i = data.numCards; i < 7; i++) {
+      console.log("counter" + i);
+      userCardArray.push(gameRoom.answers[i]);
+    }
+    socket.emit("ANSWER", userCardArray);
   });
   socket.on("disconnect", function() {
     numUsers--;
