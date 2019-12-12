@@ -10,12 +10,6 @@ require("dotenv").config();
 var http = require("http").createServer(app);
 var io = require("socket.io")(http);
 
-//require the http module
-// const http = require("http").Server(app);
-
-// require the socket.io module
-// const io = require("socket.io");
-
 // Environment Variables
 const mongoURI = process.env.MONGODB_URI;
 const PORT = process.env.PORT || 3004;
@@ -98,15 +92,10 @@ app.get("*", (req, res) => {
   res.status(404).json("Sorry, page not found");
 });
 
-// io.on("connection", function(socket) {
-//   socket.on("chat message", function(msg) {
-//     io.emit("chat message", msg);
-//   });
-// });
-
 io.on("connection", function(socket) {
   numUsers++;
   userArray.push(socket.id);
+
   console.log(socket.id + " connected");
   console.log("Users online : " + numUsers);
   console.log("the array is" + userArray);
@@ -117,16 +106,30 @@ io.on("connection", function(socket) {
   });
   socket.on("SEND_MESSAGE", function(data) {
     console.log(socket.id + ": SENT MESSAGE - " + data);
-    console.log(userArray[3]);
-    io.to(userArray[3]).emit("RECEIVE_MESSAGE", data); // private messaging proof of concept
+
+    io.emit("RECEIVE_MESSAGE", data);
+    // io.to(userArray[3]).emit("RECEIVE_MESSAGE", data); // private messaging proof of concept
   });
   socket.on("JOIN_GAME", function(data) {
     console.log(socket.id + ": JOIN GAME - " + data);
-    io.to(socket.id).emit("QUESTION", gameRoom.Questions[0]);
+    io.emit("QUESTION", gameRoom.Questions[0]);
+  });
+  socket.on("SEND_USERNAME", function(data) {
+    console.log(socket.id + ": SEND USERNAME - " + data.username);
+    socket.username = data.username;
+    console.log("socket username is " + socket.username);
+    socket.emit("USERNAME", data.username);
   });
   socket.on("ANSWER", function(data) {
-    console.log(socket.id + ": ANSWER - " + data);
-    io.to(socket.id).emit("ANSWER", gameRoom.answers[0]);
+    // FUNCTION TO ASSIGN 7 CARDS TO EACH PLAYER. numCards variable to simulate how many cards they have in their hand.
+    var userCardArray = []; // push cards here to emit to user to give them their 7 cards.
+    console.log(socket.id + ": ANSWER - " + data.numCards);
+    for (i = data.numCards; i < 7; i++) {
+      console.log("counter" + i);
+      userCardArray.push(gameRoom.answers[0]);
+      gameRoom.answers.splice(0, 1);
+    }
+    socket.emit("ANSWER", userCardArray);
   });
   socket.on("disconnect", function() {
     numUsers--;
