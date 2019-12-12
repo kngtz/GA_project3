@@ -17,7 +17,8 @@ class ChatBox extends React.Component {
       message: "",
       messages: [],
       question: "",
-      answer: []
+      answer: [],
+      numCards: 0
     };
   }
 
@@ -52,7 +53,7 @@ class ChatBox extends React.Component {
     return (
       <div className="card">
         <div className="card-body">
-          <div className="card-title">QUESTION:{this.state.question}</div>
+          <div className="card-title">Global Chat</div>
 
           <hr />
           <div className="messages">
@@ -74,6 +75,7 @@ class ChatBox extends React.Component {
             value={this.state.username}
             onChange={this.handleChange}
           />
+
           <br />
           <input
             type="text"

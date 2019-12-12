@@ -10,12 +10,6 @@ require("dotenv").config();
 var http = require("http").createServer(app);
 var io = require("socket.io")(http);
 
-//require the http module
-// const http = require("http").Server(app);
-
-// require the socket.io module
-// const io = require("socket.io");
-
 // Environment Variables
 const mongoURI = process.env.MONGODB_URI;
 const PORT = process.env.PORT || 3004;
@@ -68,7 +62,7 @@ var gameRoom = {
     "Violating the First Law of Robotics."
   ]
 };
-var userCardArray = []; // push cards here to emit to user to give them their 7 cards.
+
 // Routes
 const todosController = require("./controllers/todos.js");
 app.use("/todos", todosController);
@@ -127,10 +121,13 @@ io.on("connection", function(socket) {
     socket.emit("USERNAME", data.username);
   });
   socket.on("ANSWER", function(data) {
+    // FUNCTION TO ASSIGN 7 CARDS TO EACH PLAYER. numCards variable to simulate how many cards they have in their hand.
+    var userCardArray = []; // push cards here to emit to user to give them their 7 cards.
     console.log(socket.id + ": ANSWER - " + data.numCards);
     for (i = data.numCards; i < 7; i++) {
       console.log("counter" + i);
-      userCardArray.push(gameRoom.answers[i]);
+      userCardArray.push(gameRoom.answers[0]);
+      gameRoom.answers.splice(0, 1);
     }
     socket.emit("ANSWER", userCardArray);
   });
