@@ -201,9 +201,7 @@ class App extends React.Component {
               <Player answers={answers} random={this.state.randomAnswer} />
             </div>
 
-            <div class="col-4">
-              <h1></h1>
-            </div>
+            <div class="col-4">{/* <ChatBoxx /> */}</div>
           </div>
           <ChatBox />
           <ul>

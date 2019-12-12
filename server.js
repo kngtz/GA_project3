@@ -118,11 +118,12 @@ io.on("connection", function(socket) {
   socket.on("SEND_MESSAGE", function(data) {
     console.log(socket.id + ": SENT MESSAGE - " + data);
     console.log(userArray[3]);
-    io.to(userArray[3]).emit("RECEIVE_MESSAGE", data); // private messaging proof of concept
+    io.emit("RECEIVE_MESSAGE", data);
+    // io.to(userArray[3]).emit("RECEIVE_MESSAGE", data); // private messaging proof of concept
   });
   socket.on("JOIN_GAME", function(data) {
     console.log(socket.id + ": JOIN GAME - " + data);
-    io.to(socket.id).emit("QUESTION", gameRoom.Questions[0]);
+    io.emit("QUESTION", gameRoom.Questions[0]);
   });
   socket.on("ANSWER", function(data) {
     console.log(socket.id + ": ANSWER - " + data);
