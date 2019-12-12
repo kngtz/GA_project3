@@ -1,3 +1,5 @@
+// THIS IS FOR REFERENCE FOR CLEANING UP THE APP.JS FILE
+
 const { BrowserRouter, Link, Switch, Route, browserHistory } = ReactRouterDOM;
 // var socket = io();
 // import io from "socket.io-client";
@@ -17,7 +19,8 @@ class ChatBox extends React.Component {
       message: "",
       messages: [],
       question: "",
-      answer: []
+      answer: [],
+      numCards: 0
     };
   }
 
@@ -26,6 +29,16 @@ class ChatBox extends React.Component {
     console.log("socket:", this.socket);
     this.socket.on("RECEIVE_MESSAGE", data => {
       this.addMessage(data);
+    });
+    this.socket.on("QUESTION", question => {
+      this.setState({ question: question });
+    });
+    this.socket.on("ANSWER", answer => {
+      this.setState({ answer: answer });
+    });
+    this.socket.on("USERNAME", username => {
+      console.log("username is " + username);
+      this.setState({ username: username });
     });
   }
 
@@ -44,6 +57,27 @@ class ChatBox extends React.Component {
     });
   };
 
+  sendUsername = ev => {
+    ev.preventDefault();
+
+    this.socket.emit("SEND_USERNAME", {
+      username: this.state.username
+    });
+  };
+
+  joinGame = ev => {
+    ev.preventDefault();
+
+    this.socket.emit("JOIN_GAME", {});
+  };
+  answer = ev => {
+    ev.preventDefault();
+
+    this.socket.emit("ANSWER", {
+      numCards: this.state.numCards
+    });
+  };
+
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
   };
@@ -53,7 +87,11 @@ class ChatBox extends React.Component {
       <div className="card">
         <div className="card-body">
           <div className="card-title">QUESTION:{this.state.question}</div>
-
+          <div>
+            {this.state.answer.map(answer => {
+              return <div>{answer}</div>;
+            })}
+          </div>
           <hr />
           <div className="messages">
             {this.state.messages.map(message => {
@@ -74,6 +112,13 @@ class ChatBox extends React.Component {
             value={this.state.username}
             onChange={this.handleChange}
           />
+
+          <button
+            onClick={this.sendUsername}
+            className="btn btn-primary form-control"
+          >
+            Submit Username
+          </button>
           <br />
           <input
             type="text"
@@ -89,6 +134,18 @@ class ChatBox extends React.Component {
             className="btn btn-primary form-control"
           >
             Send
+          </button>
+          <button
+            onClick={this.joinGame}
+            className="btn btn-primary form-control"
+          >
+            Join Game
+          </button>
+          <button
+            onClick={this.answer}
+            className="btn btn-primary form-control"
+          >
+            Answers
           </button>
         </div>
       </div>

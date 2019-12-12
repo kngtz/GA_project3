@@ -1,3 +1,5 @@
+//placeholder file for future use
+
 class Chatboxx extends React.Component {
   render() {
     return (

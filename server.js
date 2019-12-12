@@ -98,12 +98,6 @@ app.get("*", (req, res) => {
   res.status(404).json("Sorry, page not found");
 });
 
-// io.on("connection", function(socket) {
-//   socket.on("chat message", function(msg) {
-//     io.emit("chat message", msg);
-//   });
-// });
-
 io.on("connection", function(socket) {
   numUsers++;
   userArray.push(socket.id);
