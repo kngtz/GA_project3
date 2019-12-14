@@ -165,11 +165,19 @@ class SubmitUser extends React.Component {
 
   joinGame = ev => {
     ev.preventDefault();
+<<<<<<< HEAD
+=======
+
+>>>>>>> ae44705efebdd16ca9b167c7c3d96a5d21f9a648
     this.props.socket.emit("JOIN_GAME", {});
   };
 
   startRound = ev => {
     ev.preventDefault();
+<<<<<<< HEAD
+=======
+
+>>>>>>> ae44705efebdd16ca9b167c7c3d96a5d21f9a648
     this.props.socket.emit("START_ROUND", {});
   };
 
@@ -205,7 +213,7 @@ class SubmitUser extends React.Component {
           onClick={this.startRound}
           className="btn btn-primary form-control"
         >
-          Join Game
+          Start Round
         </button>
       </div>
     );

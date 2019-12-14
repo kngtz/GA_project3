@@ -138,16 +138,14 @@ io.on("connection", function(socket) {
     gameRoom.questions.splice(0, 1);
     console.log(gameRoom.players.length);
     for (i = 0; i < gameRoom.players.length; i++) {
-      var userCardArray = [4, 5, 6, 7]; // push cards here to emit to user to give them their 7 cards.
+      var userCardArray = []; // push cards here to emit to user to give them their 7 cards.
       console.log(socket.id + ": ASSIGN CARDS - ");
-      // for (n = gameRoom.players[i].cards.length; i < 5; n++) {
-      //   console.log("counter" + n);
-      //   userCardArray.push(gameRoom.answers[0]);
-      //   gameRoom.answers.splice(0, 1);
-      // }
-      io
-        // .to(gameRoom.players[i].connectionSocket)
-        .emit("CARDS", userCardArray);
+      for (n = gameRoom.players[i].cards.length; n < 5; n++) {
+        console.log("counter" + n);
+        userCardArray.push(gameRoom.answers[0]);
+        gameRoom.answers.splice(0, 1);
+      }
+      io.to(gameRoom.players[i].connectionSocket).emit("CARDS", userCardArray);
     }
   });
 
