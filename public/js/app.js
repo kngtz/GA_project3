@@ -21,7 +21,7 @@ class ChatBox extends React.Component {
   }
 
   componentDidMount() {
-    // this.socket = io("localhost:3000");
+    // this.props.socket = io("localhost:3000");
     console.log("ChatBox-socket:", this.props.socket);
     this.props.socket.on("RECEIVE_MESSAGE", data => {
       this.addMessage(data);
@@ -36,7 +36,7 @@ class ChatBox extends React.Component {
 
   sendMessage = ev => {
     ev.preventDefault();
-    this.socket.emit("SEND_MESSAGE", {
+    this.props.socket.emit("SEND_MESSAGE", {
       author: this.state.username,
       message: this.state.message
     });
@@ -104,14 +104,14 @@ class ScoreBoard extends React.Component {
     };
   }
   componentDidMount() {
-    // this.socket = io("localhost:3000");
+    // this.props.socket = io("localhost:3000");
     console.log("ScoreBoard-socket:", this.props.socket);
-    // this.socket.on("USERNAME", username => {
+    // this.props.socket.on("USERNAME", username => {
     //   console.log("username is " + username);
     //   this.setState({ username: username });
     // });
 
-    this.props.socket.on("ROOM_PLAYERS ", players => {
+    this.props.socket.on("ROOM_PLAYERS", players => {
       console.log("username is " + players);
 
       this.setState({ players: players });
@@ -148,7 +148,7 @@ class SubmitUser extends React.Component {
     };
   }
   componentDidMount() {
-    // this.socket = io("localhost:3000");
+    // this.props.socket = io("localhost:3000");
     this.props.socket.on("USERNAME", username => {
       console.log("SubmitUser-username is " + username);
       this.setState({ username: username });
@@ -157,7 +157,7 @@ class SubmitUser extends React.Component {
 
   sendUsername = ev => {
     ev.preventDefault();
-    this.socket.emit("SEND_USERNAME", {
+    this.props.socket.emit("SEND_USERNAME", {
       username: this.state.username
     });
   };
@@ -165,12 +165,12 @@ class SubmitUser extends React.Component {
   joinGame = ev => {
     ev.preventDefault();
 
-    this.socket.emit("JOIN_GAME", {});
+    this.props.socket.emit("JOIN_GAME", {});
   };
   startRound = ev => {
     ev.preventDefault();
 
-    this.socket.emit("START_ROUND", {});
+    this.props.socket.emit("START_ROUND", {});
   };
 
   handleChange = event => {
@@ -204,7 +204,7 @@ class SubmitUser extends React.Component {
           onClick={this.startRound}
           className="btn btn-primary form-control"
         >
-          Join Game
+          Start Round
         </button>
       </div>
     );
@@ -222,7 +222,7 @@ class GameArea extends React.Component {
     };
   }
   componentDidMount() {
-    // this.socket = io("localhost:3000");
+    // this.props.socket = io("localhost:3000");
     console.log("GameArea-socket:", this.props.socket);
     this.props.socket.on("QUESTION", question => {
       this.setState({ question: question });
@@ -275,7 +275,7 @@ class PlayerHand extends React.Component {
     };
   }
   componentDidMount() {
-    // this.socket = io("localhost:3000");
+    // this.props.socket = io("localhost:3000");
     console.log("PlayerHand-socket:", this.props.socket);
     this.props.socket.on("CARDS", cards => {
       this.setState({ cards: cards });
