@@ -127,7 +127,7 @@ io.on("connection", function(socket) {
       cards: [],
       score: 0
     });
-
+    console.log("JOIN GAME");
     io.emit("ROOM_PLAYERS", gameRoom.players);
   });
   socket.on("START_ROUND", function(data) {
@@ -139,6 +139,7 @@ io.on("connection", function(socket) {
 
       for (n = gameRoom.players[i].cards.length; n < 5; n++) {
         userCardArray.push(gameRoom.answers[0]);
+        gameRoom.players[i].cards.push(gameRoom.answers[0]);
         gameRoom.answers.splice(0, 1);
       }
       io.to(gameRoom.players[i].connectionSocket).emit("CARDS", userCardArray);
@@ -147,12 +148,15 @@ io.on("connection", function(socket) {
 
   socket.on("SUBMIT_ANSWER", function(data) {
     console.log(socket.id + ": SUBMIT ANSWER - " + data.answer);
-    submittedAns.push({ socket: socket, answer: data.answer });
+    submittedAns.push({ socketval: socket.username, answer: data.answer });
+
+    console.log();
+    console.log(gameRoom.players.cards);
     if (submittedAns.length == gameRoom.players.length) {
       console.log("all players submitted");
       console.log(submittedAns);
 
-      socket.emit("ANSWER", submittedAns);
+      io.emit("ANSWER", submittedAns);
       for (i = 0; i < gameRoom.players.length; i++) {
         gameRoom.players[i].cards.splice(
           gameRoom.players[i].cards.findIndex(
