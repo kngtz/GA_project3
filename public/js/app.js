@@ -114,8 +114,8 @@ class ScoreBoard extends React.Component {
     //   console.log("username is " + username);
     //   this.setState({ username: username });
     // });
-    this.socket.on("ROOM_PLAYERS ", players => {
-      console.log("username is " + players);
+    this.socket.on("ROOM_PLAYERS", players => {
+      console.log("PLAYERS ARE " + players);
       this.setState({ players: players });
     });
   }
@@ -163,6 +163,17 @@ class SubmitUser extends React.Component {
     });
   };
 
+  joinGame = ev => {
+    ev.preventDefault();
+
+    this.socket.emit("JOIN_GAME", {});
+  };
+  startRound = ev => {
+    ev.preventDefault();
+
+    this.socket.emit("START_ROUND", {});
+  };
+
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
   };
@@ -183,6 +194,18 @@ class SubmitUser extends React.Component {
           className="btn btn-primary form-control"
         >
           Submit Username
+        </button>
+        <button
+          onClick={this.joinGame}
+          className="btn btn-primary form-control"
+        >
+          Join Game
+        </button>
+        <button
+          onClick={this.startRound}
+          className="btn btn-primary form-control"
+        >
+          Join Game
         </button>
       </div>
     );
@@ -231,7 +254,7 @@ class GameArea extends React.Component {
             <div className="card-body">
               <div className="card-title">
                 <h3>Question: </h3>
-                <p>{this.props.questions[this.props.random]}</p>
+                <p>{this.state.question}</p>
               </div>
             </div>
           </div>
@@ -249,35 +272,24 @@ class PlayerHand extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
-      answer: [],
-      numCards: 0
+      cards: [1, 2, 3, 4]
     };
   }
   componentDidMount() {
     this.socket = io("localhost:3000");
-    this.socket.on("USERNAME", username => {
-      console.log("username is " + username);
-      this.setState({ username: username });
-    });
-    this.socket.on("ANSWER", answer => {
-      this.setState({ answer: answer });
+
+    this.socket.on("CARDS", cards => {
+      console.log("cardssssss");
+      this.setState({ cards: cards });
     });
   }
 
-  sendUsername = ev => {
-    ev.preventDefault();
-    this.socket.emit("SEND_USERNAME", {
-      username: this.state.username
-    });
-  };
-
-  answer = ev => {
-    ev.preventDefault();
-    this.socket.emit("ANSWER", {
-      numCards: this.state.numCards
-    });
-  };
+  // answer = ev => {
+  //   ev.preventDefault();
+  //   this.socket.emit("ANSWER", {
+  //     numCards: this.state.numCards
+  //   });
+  // };
 
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
@@ -288,7 +300,11 @@ class PlayerHand extends React.Component {
       <div className="card">
         <div className="card-body">
           <div className="card-title">
-            {this.props.answers[this.props.random]}
+            <ul>
+              {this.state.cards.map(card => {
+                return <li>{card}</li>;
+              })}
+            </ul>
           </div>
         </div>
       </div>
