@@ -37,6 +37,7 @@ app.get("/", function(req, res) {
 //initialise variables
 let numUsers = 0;
 let userArray = [];
+let submittedAns = [];
 var gameRoom = {
   Name: "Room 1",
   players: [],
@@ -115,9 +116,8 @@ io.on("connection", function(socket) {
   // CHAT BOX FUNCTION ===============================================================================
 
   socket.on("SEND_USERNAME", function(data) {
-    console.log(socket.id + ": SEND USERNAME - " + data.username);
     socket.username = data.username;
-    console.log("socket username is " + socket.username);
+
     socket.emit("USERNAME", data.username);
   });
   socket.on("JOIN_GAME", function(data) {
@@ -127,21 +127,17 @@ io.on("connection", function(socket) {
       cards: [],
       score: 0
     });
-    console.log(socket.id + ": JOIN GAME - " + data);
-    console.log(gameRoom);
-    console.log(gameRoom.players[0]);
+
     io.emit("ROOM_PLAYERS", gameRoom.players);
   });
   socket.on("START_ROUND", function(data) {
-    console.log(socket.id + ": START ROUND - " + data);
     io.emit("QUESTION", gameRoom.questions[0]);
     gameRoom.questions.splice(0, 1);
-    console.log(gameRoom.players.length);
+
     for (i = 0; i < gameRoom.players.length; i++) {
       var userCardArray = []; // push cards here to emit to user to give them their 7 cards.
-      console.log(socket.id + ": ASSIGN CARDS - ");
+
       for (n = gameRoom.players[i].cards.length; n < 5; n++) {
-        console.log("counter" + n);
         userCardArray.push(gameRoom.answers[0]);
         gameRoom.answers.splice(0, 1);
       }
@@ -149,16 +145,27 @@ io.on("connection", function(socket) {
     }
   });
 
-  socket.on("ANSWER", function(data) {
-    // FUNCTION TO ASSIGN 7 CARDS TO EACH PLAYER. numCards variable to simulate how many cards they have in their hand.
-    var userCardArray = []; // push cards here to emit to user to give them their 7 cards.
-    console.log(socket.id + ": ANSWER - " + data.numCards);
-    for (i = data.numCards; i < 7; i++) {
-      console.log("counter" + i);
-      userCardArray.push(gameRoom.answers[0]);
-      gameRoom.answers.splice(0, 1);
+  socket.on("SUBMIT_ANSWER", function(data) {
+    console.log(socket.id + ": SUBMIT ANSWER - " + data.answer);
+    submittedAns.push({ socket: socket, answer: data.answer });
+    if (submittedAns.length == gameRoom.players.length) {
+      console.log("all players submitted");
+      console.log(submittedAns);
+
+      socket.emit("ANSWER", submittedAns);
+      for (i = 0; i < gameRoom.players.length; i++) {
+        gameRoom.players[i].cards.splice(
+          gameRoom.players[i].cards.findIndex(
+            cards => cards === submittedAns.answer
+          ),
+          1
+        );
+        console.log(gameRoom.players.cards);
+      }
+    } else {
+      console.log("still awaiting answers");
+      console.log(submittedAns);
     }
-    socket.emit("ANSWER", userCardArray);
   });
   socket.on("disconnect", function() {
     numUsers--;
