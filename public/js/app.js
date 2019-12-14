@@ -17,7 +17,8 @@ class ChatBox extends React.Component {
       message: "",
       messages: [],
       question: "",
-      answer: ""
+      answer: [],
+      numCards: 0
     };
   }
 
@@ -26,12 +27,6 @@ class ChatBox extends React.Component {
     console.log("socket:", this.socket);
     this.socket.on("RECEIVE_MESSAGE", data => {
       this.addMessage(data);
-    });
-    this.socket.on("QUESTION", question => {
-      this.setState({ question: question });
-    });
-    this.socket.on("ANSWER", answer => {
-      this.setState({ answer: answer });
     });
   }
 
@@ -50,88 +45,53 @@ class ChatBox extends React.Component {
     });
   };
 
-  joinGame = ev => {
-    ev.preventDefault();
-
-    this.socket.emit("JOIN_GAME", {
-      author: this.state.username,
-      message: this.state.message
-    });
-  };
-  answer = ev => {
-    ev.preventDefault();
-
-    this.socket.emit("ANSWER", {
-      author: this.state.username,
-      message: this.state.message
-    });
-  };
-
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
   };
 
   render() {
     return (
-      <div className="container">
-        <div className="row">
-          <div className="col-4">
-            <div className="card">
-              <div className="card-body">
-                <div className="card-title">
-                  {this.state.question}:{this.state.answer}
+      <div className="card">
+        <div className="card-body">
+          <div className="card-title">Global Chat</div>
+
+          <hr />
+          <div className="messages">
+            {this.state.messages.map(message => {
+              return (
+                <div>
+                  {message.author}: {message.message}
                 </div>
-                <hr />
-                <div className="messages">
-                  {this.state.messages.map(message => {
-                    return (
-                      <div>
-                        {message.author}: {message.message}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="card-footer">
-                <input
-                  type="text"
-                  placeholder="Username"
-                  name="username"
-                  className="form-control"
-                  value={this.state.username}
-                  onChange={this.handleChange}
-                />
-                <br />
-                <input
-                  type="text"
-                  placeholder="Message"
-                  name="message"
-                  className="form-control"
-                  value={this.state.message}
-                  onChange={this.handleChange}
-                />
-                <br />
-                <button
-                  onClick={this.sendMessage}
-                  className="btn btn-primary form-control"
-                >
-                  Send
-                </button>
-                <button
-                  onClick={this.joinGame}
-                  className="btn btn-primary form-control"
-                >
-                  Join Game
-                </button>
-                <button
-                  onClick={this.answer}
-                  className="btn btn-primary form-control"
-                >
-                  Answers
-                </button>
-              </div>
-            </div>
+              );
+            })}
           </div>
+        </div>
+        <div className="card-footer">
+          <input
+            type="text"
+            placeholder="Username"
+            name="username"
+            className="form-control"
+            value={this.state.username}
+            onChange={this.handleChange}
+          />
+
+          <br />
+          <input
+            type="text"
+            placeholder="Message"
+            name="message"
+            className="form-control"
+            value={this.state.message}
+            onChange={this.handleChange}
+          />
+          <br />
+          <button
+            onClick={this.sendMessage}
+            className="btn btn-primary form-control"
+          >
+            Send
+          </button>
         </div>
       </div>
     );
@@ -202,10 +162,10 @@ class App extends React.Component {
             </div>
 
             <div class="col-4">
-              <h1></h1>
+              <ChatBox />
             </div>
           </div>
-          <ChatBox />
+
           <ul>
             <li>
               <Link to="/">Home</Link>
