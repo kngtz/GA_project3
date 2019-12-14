@@ -4,8 +4,11 @@ const mongoose = require("mongoose");
 const app = express();
 const db = mongoose.connection;
 const bodyParser = require("body-parser");
-
+const questions = require("./data/questions.js");
+const answers = require("./data/answers.js");
 require("dotenv").config();
+
+console.log(answers[0]);
 
 var http = require("http").createServer(app);
 var io = require("socket.io")(http);
@@ -143,13 +146,13 @@ io.on("connection", function(socket) {
   socket.on("START_ROUND", function(data) {
     submittedAnswer = [];
     io.emit("SHOW_RESULT", submittedAnswer);
-    io.emit("QUESTION", gameRoom.questions[0]);
-    gameRoom.questions.splice(0, 1);
+    io.emit("QUESTION", questions[20].text);
+    questions.splice(0, 1);
 
     for (i = 0; i < gameRoom.players.length; i++) {
       for (n = gameRoom.players[i].cards.length; n < 5; n++) {
-        gameRoom.players[i].cards.push(gameRoom.answers[0]);
-        gameRoom.answers.splice(0, 1);
+        gameRoom.players[i].cards.push(answers[0]);
+        answers.splice(0, 1);
       }
       io.to(gameRoom.players[i].connectionSocket).emit(
         "CARDS",
