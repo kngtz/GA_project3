@@ -1,8 +1,8 @@
 const { BrowserRouter, Link, Switch, Route, browserHistory } = ReactRouterDOM;
 // var socket = io();
 // import io from "socket.io-client";
-// let socket = io(`http://192.168.170.239:3000`);
-let socket = io(`http://localhost:3000`);
+let socket = io(`http://192.168.170.239:3000`);
+// let socket = io(`http://localhost:3000`);
 
 class Header extends React.Component {
   render() {
@@ -212,7 +212,8 @@ class GameArea extends React.Component {
     this.state = {
       username: "",
       question: "",
-      answer: []
+      vote: "",
+      answers: []
     };
   }
   componentDidMount() {
@@ -221,21 +222,17 @@ class GameArea extends React.Component {
     this.props.socket.on("QUESTION", question => {
       this.setState({ question: question });
     });
-    this.props.socket.on("ANSWER", answer => {
-      this.setState({ answer: answer });
+    this.props.socket.on("SHOW_RESULT", submittedAnswer => {
+      this.setState({ answers: submittedAnswer });
     });
   }
-  sendUsername = ev => {
-    ev.preventDefault();
-    this.props.socket.emit("SEND_USERNAME", {
-      username: this.state.username
-    });
-  };
 
-  answer = ev => {
-    ev.preventDefault();
-    this.props.socket.emit("ANSWER", {
-      numCards: this.state.numCards
+  submitVote = answer => {
+    this.setState({ vote: answer.answer }, () => {
+      console.log(this.state.answer);
+      this.props.socket.emit("SUBMIT_VOTE", {
+        vote: this.state.vote
+      });
     });
   };
 
@@ -248,6 +245,23 @@ class GameArea extends React.Component {
               <div className="card-title">
                 <h3>Question: </h3>
                 <p>{this.state.question}</p>
+              </div>
+            </div>
+          </div>
+          <hr />
+          <div className="card">
+            <div className="card-body">
+              <div className="card-title">
+                <h3>Answers: </h3>
+                <ul>
+                  {this.state.answers.map(answer => {
+                    return (
+                      <li onClick={() => this.submitVote(answer)}>
+                        {answer.answer}
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
             </div>
           </div>
