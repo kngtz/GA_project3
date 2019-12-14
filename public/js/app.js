@@ -111,7 +111,7 @@ class ScoreBoard extends React.Component {
     //   this.setState({ username: username });
     // });
 
-    this.props.socket.on("ROOM_PLAYERS ", players => {
+    this.props.socket.on("ROOM_PLAYERS", players => {
       console.log("username is " + players);
 
       this.setState({ players: players });
@@ -147,6 +147,7 @@ class SubmitUser extends React.Component {
       username: ""
     };
   }
+
   componentDidMount() {
     // this.props.socket = io("localhost:3000");
     this.props.socket.on("USERNAME", username => {
@@ -164,18 +165,18 @@ class SubmitUser extends React.Component {
 
   joinGame = ev => {
     ev.preventDefault();
-
-    this.socket.emit("JOIN_GAME", {});
+    this.props.socket.emit("JOIN_GAME", {});
   };
+
   startRound = ev => {
     ev.preventDefault();
-
-    this.socket.emit("START_ROUND", {});
+    this.props.socket.emit("START_ROUND", {});
   };
 
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
   };
+
   render() {
     return (
       <div>
