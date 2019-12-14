@@ -113,6 +113,7 @@ io.on("connection", function(socket) {
   });
 
   // CHAT BOX FUNCTION ===============================================================================
+
   socket.on("SEND_USERNAME", function(data) {
     console.log(socket.id + ": SEND USERNAME - " + data.username);
     socket.username = data.username;
@@ -123,25 +124,28 @@ io.on("connection", function(socket) {
     gameRoom.players.push({
       connectionSocket: socket.id,
       name: socket.username,
-      cards: []
+      cards: [],
+      score: 0
     });
     console.log(socket.id + ": JOIN GAME - " + data);
     console.log(gameRoom);
     console.log(gameRoom.players[0]);
-    io.emit("ROOM_PLAYERS", gameRoom.players);
+    io.emit("ROOM_PLAYERS", gameRoom.players.name, gameRoom.players.score);
   });
   socket.on("START_ROUND", function(data) {
     console.log(socket.id + ": START ROUND - " + data);
     io.emit("QUESTION", gameRoom.questions[0]);
     gameRoom.questions.splice(0, 1);
-    var userCardArray = []; // push cards here to emit to user to give them their 7 cards.
-    console.log(socket.id + ": ASSIGN CARDS - " + data.numCards);
-    for (i = data.numCards; i < 7; i++) {
-      console.log("counter" + i);
-      userCardArray.push(gameRoom.answers[0]);
-      gameRoom.answers.splice(0, 1);
+    for (i = 0; i > gameRoom.players.length; i++) {
+      var userCardArray = []; // push cards here to emit to user to give them their 7 cards.
+      console.log(socket.id + ": ASSIGN CARDS - " + data.numCards);
+      for (i = data.numCards; i < 7; i++) {
+        console.log("counter" + i);
+        userCardArray.push(gameRoom.answers[0]);
+        gameRoom.answers.splice(0, 1);
+      }
+      socket.emit("ANSWER", userCardArray);
     }
-    socket.emit("ANSWER", userCardArray);
   });
 
   socket.on("ANSWER", function(data) {
