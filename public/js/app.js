@@ -104,30 +104,34 @@ class ScoreBoard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: ""
+      players: []
     };
   }
   componentDidMount() {
     this.socket = io("localhost:3000");
     console.log("socket:", this.socket);
-    this.socket.on("USERNAME", username => {
-      console.log("username is " + username);
-      this.setState({ username: username });
+    // this.socket.on("USERNAME", username => {
+    //   console.log("username is " + username);
+    //   this.setState({ username: username });
+    // });
+    this.socket.on("ROOM_PLAYERS ", players => {
+      console.log("username is " + players);
+      this.setState({ players: players });
     });
   }
-  sendUsername = ev => {
-    ev.preventDefault();
-
-    this.socket.emit("SEND_USERNAME", {
-      username: this.state.username
-    });
-  };
   render() {
     return (
       <div className="card">
         <div className="card-body">
           <div className="card-title">
             <p>Score Board</p>
+            {this.state.players.map(player => {
+              return (
+                <div>
+                  {player.name}: {player.score}
+                </div>
+              );
+            })}
             <SubmitUser />
           </div>
         </div>
