@@ -21,7 +21,7 @@ class ChatBox extends React.Component {
   }
 
   componentDidMount() {
-    // this.socket = io("localhost:3000");
+    // this.props.socket = io("localhost:3000");
     console.log("ChatBox-socket:", this.props.socket);
     this.props.socket.on("RECEIVE_MESSAGE", data => {
       this.addMessage(data);
@@ -36,7 +36,7 @@ class ChatBox extends React.Component {
 
   sendMessage = ev => {
     ev.preventDefault();
-    this.socket.emit("SEND_MESSAGE", {
+    this.props.socket.emit("SEND_MESSAGE", {
       author: this.state.username,
       message: this.state.message
     });
@@ -104,9 +104,9 @@ class ScoreBoard extends React.Component {
     };
   }
   componentDidMount() {
-    // this.socket = io("localhost:3000");
+    // this.props.socket = io("localhost:3000");
     console.log("ScoreBoard-socket:", this.props.socket);
-    // this.socket.on("USERNAME", username => {
+    // this.props.socket.on("USERNAME", username => {
     //   console.log("username is " + username);
     //   this.setState({ username: username });
     // });
@@ -146,7 +146,7 @@ class SubmitUser extends React.Component {
     };
   }
   componentDidMount() {
-    // this.socket = io("localhost:3000");
+    // this.props.socket = io("localhost:3000");
     this.props.socket.on("USERNAME", username => {
       console.log("SubmitUser-username is " + username);
       this.setState({ username: username });
@@ -155,7 +155,7 @@ class SubmitUser extends React.Component {
 
   sendUsername = ev => {
     ev.preventDefault();
-    this.socket.emit("SEND_USERNAME", {
+    this.props.socket.emit("SEND_USERNAME", {
       username: this.state.username
     });
   };
@@ -197,7 +197,7 @@ class GameArea extends React.Component {
     };
   }
   componentDidMount() {
-    // this.socket = io("localhost:3000");
+    // this.props.socket = io("localhost:3000");
     console.log("GameArea-socket:", this.props.socket);
     this.props.socket.on("QUESTION", question => {
       this.setState({ question: question });
@@ -250,7 +250,7 @@ class PlayerHand extends React.Component {
     };
   }
   componentDidMount() {
-    // this.socket = io("localhost:3000");
+    // this.props.socket = io("localhost:3000");
     console.log("PlayerHand-socket:", this.props.socket);
     this.props.socket.on("CARDS", cards => {
       this.setState({ cards: cards });
@@ -275,7 +275,7 @@ class PlayerHand extends React.Component {
           <div className="card-title">
             <ul>
               {this.state.cards.map(card => {
-                return <li>card</li>;
+                return <li>{card}</li>;
               })}
             </ul>
           </div>
