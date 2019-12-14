@@ -1,6 +1,7 @@
 const { BrowserRouter, Link, Switch, Route, browserHistory } = ReactRouterDOM;
 // var socket = io();
 // import io from "socket.io-client";
+let socket = io(`http://localhost:3000`);
 
 class Header extends React.Component {
   render() {
@@ -12,21 +13,17 @@ class Header extends React.Component {
 class ChatBox extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       username: "",
       message: "",
-      messages: [],
-      question: "",
-      answer: [],
-      numCards: 0
+      messages: []
     };
   }
 
   componentDidMount() {
-    this.socket = io("localhost:3000");
-    console.log("socket:", this.socket);
-    this.socket.on("RECEIVE_MESSAGE", data => {
+    // this.socket = io("localhost:3000");
+    console.log("ChatBox-socket:", this.props.socket);
+    this.props.socket.on("RECEIVE_MESSAGE", data => {
       this.addMessage(data);
     });
   }
@@ -39,7 +36,6 @@ class ChatBox extends React.Component {
 
   sendMessage = ev => {
     ev.preventDefault();
-
     this.socket.emit("SEND_MESSAGE", {
       author: this.state.username,
       message: this.state.message
@@ -108,13 +104,13 @@ class ScoreBoard extends React.Component {
     };
   }
   componentDidMount() {
-    this.socket = io("localhost:3000");
-    console.log("socket:", this.socket);
+    // this.socket = io("localhost:3000");
+    console.log("ScoreBoard-socket:", this.props.socket);
     // this.socket.on("USERNAME", username => {
     //   console.log("username is " + username);
     //   this.setState({ username: username });
     // });
-    this.socket.on("ROOM_PLAYERS ", players => {
+    this.props.socket.on("ROOM_PLAYERS ", players => {
       console.log("username is " + players);
       this.setState({ players: players });
     });
@@ -132,7 +128,8 @@ class ScoreBoard extends React.Component {
                 </div>
               );
             })}
-            <SubmitUser />
+            {/* to move this out of scoreboard eventually */}
+            <SubmitUser socket={this.props.socket} />
           </div>
         </div>
       </div>
@@ -149,9 +146,9 @@ class SubmitUser extends React.Component {
     };
   }
   componentDidMount() {
-    this.socket = io("localhost:3000");
-    this.socket.on("USERNAME", username => {
-      console.log("username is " + username);
+    // this.socket = io("localhost:3000");
+    this.props.socket.on("USERNAME", username => {
+      console.log("SubmitUser-username is " + username);
       this.setState({ username: username });
     });
   }
@@ -200,25 +197,25 @@ class GameArea extends React.Component {
     };
   }
   componentDidMount() {
-    this.socket = io("localhost:3000");
-    console.log("socket:", this.socket);
-    this.socket.on("QUESTION", question => {
+    // this.socket = io("localhost:3000");
+    console.log("GameArea-socket:", this.props.socket);
+    this.props.socket.on("QUESTION", question => {
       this.setState({ question: question });
     });
-    this.socket.on("ANSWER", answer => {
+    this.props.socket.on("ANSWER", answer => {
       this.setState({ answer: answer });
     });
   }
   sendUsername = ev => {
     ev.preventDefault();
-    this.socket.emit("SEND_USERNAME", {
+    this.props.socket.emit("SEND_USERNAME", {
       username: this.state.username
     });
   };
 
   answer = ev => {
     ev.preventDefault();
-    this.socket.emit("ANSWER", {
+    this.props.socket.emit("ANSWER", {
       numCards: this.state.numCards
     });
   };
@@ -237,7 +234,7 @@ class GameArea extends React.Component {
           </div>
         </div>
         <div class="col-4">
-          <ScoreBoard />
+          <ScoreBoard socket={this.props.socket} />
         </div>
       </div>
     );
@@ -249,35 +246,23 @@ class PlayerHand extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
-      answer: [],
-      numCards: 0
+      cards: []
     };
   }
   componentDidMount() {
-    this.socket = io("localhost:3000");
-    this.socket.on("USERNAME", username => {
-      console.log("username is " + username);
-      this.setState({ username: username });
-    });
-    this.socket.on("ANSWER", answer => {
-      this.setState({ answer: answer });
+    // this.socket = io("localhost:3000");
+    console.log("PlayerHand-socket:", this.props.socket);
+    this.props.socket.on("CARDS", cards => {
+      this.setState({ cards: cards });
     });
   }
 
-  sendUsername = ev => {
-    ev.preventDefault();
-    this.socket.emit("SEND_USERNAME", {
-      username: this.state.username
-    });
-  };
-
-  answer = ev => {
-    ev.preventDefault();
-    this.socket.emit("ANSWER", {
-      numCards: this.state.numCards
-    });
-  };
+  // answer = ev => {
+  //   ev.preventDefault();
+  //   this.props.socket.emit("ANSWER", {
+  //     numCards: this.state.numCards
+  //   });
+  // };
 
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
@@ -288,7 +273,11 @@ class PlayerHand extends React.Component {
       <div className="card">
         <div className="card-body">
           <div className="card-title">
-            {this.props.answers[this.props.random]}
+            <ul>
+              {this.state.cards.map(card => {
+                return <li>card</li>;
+              })}
+            </ul>
           </div>
         </div>
       </div>
@@ -300,6 +289,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      data: {},
       questions: questions,
       answers: answers,
       randomQuestion: Math.floor(
@@ -309,6 +299,12 @@ class App extends React.Component {
         Math.random() * (answers.length - 0) + 0
       ).toFixed()
     };
+  }
+  componentDidMount() {
+    socket.on("connection", data => {
+      console.log("hello");
+      this.setState({ data });
+    });
   }
   render() {
     return (
@@ -324,11 +320,12 @@ class App extends React.Component {
               <GameArea
                 questions={questions}
                 random={this.state.randomQuestion}
+                socket={socket}
               />
             </div>
 
             <div class="col-4">
-              <ChatBox />
+              <ChatBox socket={socket} />
             </div>
           </div>
 
@@ -336,7 +333,11 @@ class App extends React.Component {
 
           <div class="row">
             <div class="col-12">
-              <PlayerHand answers={answers} random={this.state.randomAnswer} />
+              <PlayerHand
+                answers={answers}
+                random={this.state.randomAnswer}
+                socket={socket}
+              />
             </div>
           </div>
 
