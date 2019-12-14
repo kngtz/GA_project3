@@ -39,8 +39,8 @@ let numUsers = 0;
 let userArray = [];
 var gameRoom = {
   Name: "Room 1",
-  Players: [{ Name: "Tom", Cards: ["a", "b", "c"] }],
-  Questions: [
+  players: [],
+  questions: [
     "Action stations! Action stations! Set condition one throughout the fleet and brace for ______!",
     "In the final round of this year's Omegathon, Omeganauts must face off in a game of ______.",
     "______ is the universe’s way of saying I need to stay away from ______.",
@@ -104,22 +104,53 @@ io.on("connection", function(socket) {
     if (error) throw error;
     console.log(clients);
   });
+  // CHAT BOX FUNCTION ===============================================================================
   socket.on("SEND_MESSAGE", function(data) {
     console.log(socket.id + ": SENT MESSAGE - " + data);
 
     io.emit("RECEIVE_MESSAGE", data);
     // io.to(userArray[3]).emit("RECEIVE_MESSAGE", data); // private messaging proof of concept
   });
-  socket.on("JOIN_GAME", function(data) {
-    console.log(socket.id + ": JOIN GAME - " + data);
-    io.emit("QUESTION", gameRoom.Questions[0]);
-  });
+
+  // CHAT BOX FUNCTION ===============================================================================
+
   socket.on("SEND_USERNAME", function(data) {
     console.log(socket.id + ": SEND USERNAME - " + data.username);
     socket.username = data.username;
     console.log("socket username is " + socket.username);
     socket.emit("USERNAME", data.username);
   });
+  socket.on("JOIN_GAME", function(data) {
+    gameRoom.players.push({
+      connectionSocket: socket.id,
+      name: socket.username,
+      cards: [],
+      score: 0
+    });
+    console.log(socket.id + ": JOIN GAME - " + data);
+    console.log(gameRoom);
+    console.log(gameRoom.players[0]);
+    io.emit("ROOM_PLAYERS", gameRoom.players);
+  });
+  socket.on("START_ROUND", function(data) {
+    console.log(socket.id + ": START ROUND - " + data);
+    io.emit("QUESTION", gameRoom.questions[0]);
+    gameRoom.questions.splice(0, 1);
+    console.log(gameRoom.players.length);
+    for (i = 0; i < gameRoom.players.length; i++) {
+      var userCardArray = [4, 5, 6, 7]; // push cards here to emit to user to give them their 7 cards.
+      console.log(socket.id + ": ASSIGN CARDS - ");
+      // for (n = gameRoom.players[i].cards.length; i < 5; n++) {
+      //   console.log("counter" + n);
+      //   userCardArray.push(gameRoom.answers[0]);
+      //   gameRoom.answers.splice(0, 1);
+      // }
+      io
+        // .to(gameRoom.players[i].connectionSocket)
+        .emit("CARDS", userCardArray);
+    }
+  });
+
   socket.on("ANSWER", function(data) {
     // FUNCTION TO ASSIGN 7 CARDS TO EACH PLAYER. numCards variable to simulate how many cards they have in their hand.
     var userCardArray = []; // push cards here to emit to user to give them their 7 cards.

@@ -110,8 +110,10 @@ class ScoreBoard extends React.Component {
     //   console.log("username is " + username);
     //   this.setState({ username: username });
     // });
+
     this.props.socket.on("ROOM_PLAYERS ", players => {
       console.log("username is " + players);
+
       this.setState({ players: players });
     });
   }
@@ -160,6 +162,17 @@ class SubmitUser extends React.Component {
     });
   };
 
+  joinGame = ev => {
+    ev.preventDefault();
+
+    this.socket.emit("JOIN_GAME", {});
+  };
+  startRound = ev => {
+    ev.preventDefault();
+
+    this.socket.emit("START_ROUND", {});
+  };
+
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
   };
@@ -180,6 +193,18 @@ class SubmitUser extends React.Component {
           className="btn btn-primary form-control"
         >
           Submit Username
+        </button>
+        <button
+          onClick={this.joinGame}
+          className="btn btn-primary form-control"
+        >
+          Join Game
+        </button>
+        <button
+          onClick={this.startRound}
+          className="btn btn-primary form-control"
+        >
+          Join Game
         </button>
       </div>
     );
@@ -228,7 +253,7 @@ class GameArea extends React.Component {
             <div className="card-body">
               <div className="card-title">
                 <h3>Question: </h3>
-                <p>{this.props.questions[this.props.random]}</p>
+                <p>{this.state.question}</p>
               </div>
             </div>
           </div>
@@ -260,6 +285,7 @@ class PlayerHand extends React.Component {
   // answer = ev => {
   //   ev.preventDefault();
   //   this.props.socket.emit("ANSWER", {
+
   //     numCards: this.state.numCards
   //   });
   // };
