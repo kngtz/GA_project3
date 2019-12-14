@@ -26,6 +26,7 @@ class ChatBox extends React.Component {
     console.log("ChatBox-socket:", this.props.socket);
     this.props.socket.on("RECEIVE_MESSAGE", data => {
       this.addMessage(data);
+      // window.scrollTo(0, document.body.scrollHeight);
     });
     this.props.socket.on("USERNAME", username => {
       this.setState({ username: username });
@@ -325,15 +326,15 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: {},
-      questions: questions,
-      answers: answers,
-      randomQuestion: Math.floor(
-        Math.random() * (questions.length - 0) + 0
-      ).toFixed(),
-      randomAnswer: Math.floor(
-        Math.random() * (answers.length - 0) + 0
-      ).toFixed()
+      data: {}
+      // questions: questions,
+      // answers: answers,
+      // randomQuestion: Math.floor(
+      //   Math.random() * (questions.length - 0) + 0
+      // ).toFixed(),
+      // randomAnswer: Math.floor(
+      //   Math.random() * (answers.length - 0) + 0
+      // ).toFixed()
     };
   }
   componentDidMount() {
@@ -354,8 +355,8 @@ class App extends React.Component {
           <div class="row">
             <div class="col-8">
               <GameArea
-                questions={questions}
-                random={this.state.randomQuestion}
+                // questions={questions}
+                // random={this.state.randomQuestion}
                 socket={socket}
               />
             </div>
@@ -370,8 +371,8 @@ class App extends React.Component {
           <div class="row">
             <div class="col-12">
               <PlayerHand
-                answers={answers}
-                random={this.state.randomAnswer}
+                // answers={answers}
+                // random={this.state.randomAnswer}
                 socket={socket}
               />
             </div>
