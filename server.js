@@ -8,8 +8,6 @@ const questions = require("./data/questions.js");
 const answers = require("./data/answers.js");
 require("dotenv").config();
 
-console.log(answers[0]);
-
 var http = require("http").createServer(app);
 var io = require("socket.io")(http);
 

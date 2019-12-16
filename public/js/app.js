@@ -1,8 +1,8 @@
 const { BrowserRouter, Link, Switch, Route, browserHistory } = ReactRouterDOM;
 // var socket = io();
 // import io from "socket.io-client";
-let socket = io(`http://192.168.170.239:3000`);
-// let socket = io(`http://localhost:3000`);
+// let socket = io(`http://192.168.170.239:3000`);
+let socket = io(`http://localhost:3000`);
 
 class Header extends React.Component {
   render() {
@@ -53,7 +53,7 @@ class ChatBox extends React.Component {
     return (
       <div className="card">
         <div className="card-body">
-          <div className="card-title">Global Chat</div>
+          <div className="card-title">Chat</div>
 
           <hr />
           <div className="messages">
@@ -116,13 +116,15 @@ class ScoreBoard extends React.Component {
         <div className="card-body">
           <div className="card-title">
             <p>Score Board</p>
-            {this.state.players.map(player => {
-              return (
-                <div>
-                  {player.name}: {player.score}
-                </div>
-              );
-            })}
+            <div className="scoreboard">
+              {this.state.players.map(player => {
+                return (
+                  <div>
+                    {player.name}: {player.score}
+                  </div>
+                );
+              })}
+            </div>
             {/* to move this out of scoreboard eventually */}
             <SubmitUser socket={this.props.socket} />
           </div>
@@ -267,7 +269,9 @@ class GameArea extends React.Component {
           </div>
         </div>
         <div class="col-4">
-          <ScoreBoard socket={this.props.socket} />
+          <div>
+            <ScoreBoard socket={this.props.socket} />
+          </div>
         </div>
       </div>
     );
@@ -325,15 +329,15 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: {},
-      questions: questions,
-      answers: answers,
-      randomQuestion: Math.floor(
-        Math.random() * (questions.length - 0) + 0
-      ).toFixed(),
-      randomAnswer: Math.floor(
-        Math.random() * (answers.length - 0) + 0
-      ).toFixed()
+      data: {}
+      // questions: questions,
+      // answers: answers,
+      // randomQuestion: Math.floor(
+      //   Math.random() * (questions.length - 0) + 0
+      // ).toFixed(),
+      // randomAnswer: Math.floor(
+      //   Math.random() * (answers.length - 0) + 0
+      // ).toFixed()
     };
   }
   componentDidMount() {
@@ -354,8 +358,8 @@ class App extends React.Component {
           <div class="row">
             <div class="col-8">
               <GameArea
-                questions={questions}
-                random={this.state.randomQuestion}
+                // questions={questions}
+                // random={this.state.randomQuestion}
                 socket={socket}
               />
             </div>
@@ -370,8 +374,8 @@ class App extends React.Component {
           <div class="row">
             <div class="col-12">
               <PlayerHand
-                answers={answers}
-                random={this.state.randomAnswer}
+                // answers={answers}
+                // random={this.state.randomAnswer}
                 socket={socket}
               />
             </div>
