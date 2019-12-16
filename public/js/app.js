@@ -1,8 +1,8 @@
 const { BrowserRouter, Link, Switch, Route, browserHistory } = ReactRouterDOM;
 // var socket = io();
 // import io from "socket.io-client";
-let socket = io(`http://192.168.170.239:3000`);
-// let socket = io(`http://localhost:3000`);
+// let socket = io(`http://192.168.170.239:3000`);
+let socket = io(`http://localhost:3000`);
 
 class Header extends React.Component {
   render() {
@@ -26,7 +26,6 @@ class ChatBox extends React.Component {
     console.log("ChatBox-socket:", this.props.socket);
     this.props.socket.on("RECEIVE_MESSAGE", data => {
       this.addMessage(data);
-      // window.scrollTo(0, document.body.scrollHeight);
     });
     this.props.socket.on("USERNAME", username => {
       this.setState({ username: username });
@@ -54,7 +53,7 @@ class ChatBox extends React.Component {
     return (
       <div className="card">
         <div className="card-body">
-          <div className="card-title">Global Chat</div>
+          <div className="card-title">Chat</div>
 
           <hr />
           <div className="messages">
@@ -117,13 +116,15 @@ class ScoreBoard extends React.Component {
         <div className="card-body">
           <div className="card-title">
             <p>Score Board</p>
-            {this.state.players.map(player => {
-              return (
-                <div>
-                  {player.name}: {player.score}
-                </div>
-              );
-            })}
+            <div className="scoreboard">
+              {this.state.players.map(player => {
+                return (
+                  <div>
+                    {player.name}: {player.score}
+                  </div>
+                );
+              })}
+            </div>
             {/* to move this out of scoreboard eventually */}
             <SubmitUser socket={this.props.socket} />
           </div>
@@ -268,7 +269,9 @@ class GameArea extends React.Component {
           </div>
         </div>
         <div class="col-4">
-          <ScoreBoard socket={this.props.socket} />
+          <div>
+            <ScoreBoard socket={this.props.socket} />
+          </div>
         </div>
       </div>
     );
