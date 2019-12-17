@@ -39,6 +39,17 @@ input[type="text"] {
   padding: 0.5em;
 }
 
+/* .scoreboard {
+  display: flex;
+  flex-flow: column nowrap;
+
+  height: 250px;
+  max-height: 250px;
+
+  overflow-y: scroll;
+  flex: 1 auto;
+} */
+
 tr {
   padding: 0.5em;
   color: var(--myrtle-green);
