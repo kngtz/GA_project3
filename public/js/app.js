@@ -1,8 +1,8 @@
 const { BrowserRouter, Link, Switch, Route, browserHistory } = ReactRouterDOM;
 // var socket = io();
 // import io from "socket.io-client";
-let socket = io(`http://192.168.170.239:3000`);
-// let socket = io(`http://localhost:3000`);
+// let socket = io(`http://192.168.170.239:3000`);
+let socket = io(`http://localhost:3000`);
 
 class Header extends React.Component {
   render() {

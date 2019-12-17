@@ -41,7 +41,7 @@ input[type="text"] {
 
 tr {
   padding: 0.5em;
-  collor: var(--myrtle-green);
+  color: var(--myrtle-green);
 }
 
 form {

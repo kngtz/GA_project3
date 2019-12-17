@@ -11,7 +11,11 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
+<<<<<<< HEAD
     "express": "^4.17.1",
+=======
+    "express": "^4.16.3",
+>>>>>>> dev
     "mongoose": "^5.7.5",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0"
