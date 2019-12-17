@@ -85,3 +85,8 @@ table {
 .complete {
   color: var(--pale-silver);
 }
+
+.player-card {
+  width: 20%;
+  height: auto;
+}
