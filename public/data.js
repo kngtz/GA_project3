@@ -1,6 +1,3 @@
-const questions = [{ text: "123" }];
-
-module.exports = questions;
 
 // module.exports = [
 //     ((questions = [
@@ -848,3 +845,4 @@ module.exports = questions;
 //     "Throwing a virgin into a volcano."
 //   ]))
 // ];
+

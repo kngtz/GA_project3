@@ -317,28 +317,41 @@ class PlayerHand extends React.Component {
   render() {
     return (
       <div className="card">
-        {/* <div className="card-body"> */}
-        {/* <ul className="list-group list-group-flush"> */}
-        {this.state.cards.map(card => {
-          return (
-            <div className="card player-card">
-              <div className="card-body">
-                {this.state.leader ? (
-                  <p className="card-text">{card}</p>
-                ) : (
-                  <p
-                    className="card-text"
-                    onClick={() => this.submitCard(card)}
-                  >
-                    {card}
-                  </p>
-                )}
-              </div>
-            </div>
-          );
-        })}
-        {/* </ul> */}
-        {/* </div> */}
+
+//         {/* <div className="card-body"> */}
+//         {/* <ul className="list-group list-group-flush"> */}
+//         {this.state.cards.map(card => {
+//           return (
+//             <div className="card player-card">
+//               <div className="card-body">
+//                 {this.state.leader ? (
+//                   <p className="card-text">{card}</p>
+//                 ) : (
+//                   <p
+//                     className="card-text"
+//                     onClick={() => this.submitCard(card)}
+//                   >
+//                     {card}
+//                   </p>
+//                 )}
+//               </div>
+//             </div>
+//           );
+//         })}
+//         {/* </ul> */}
+//         {/* </div> */}
+
+        <div className="card-body">
+          <div className="card-title">
+            <ul>
+              {this.state.cards.map(card => {
+                return <li className="btn btn-outline-dark pointer bold py-3"
+                onClick={() => this.submitCard(card)}>{card}</li>;
+              })}
+            </ul>
+          </div>
+        </div>
+
       </div>
     );
   }
