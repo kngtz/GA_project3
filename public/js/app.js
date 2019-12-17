@@ -255,10 +255,13 @@ class GameArea extends React.Component {
             <div className="card-body">
               <div className="card-title">
                 <h3>Answers: </h3>
-                <ul>
+                <ul className="list-group list-group-flush">
                   {this.state.answers.map(answer => {
                     return (
-                      <li onClick={() => this.submitVote(answer)}>
+                      <li
+                        class="list-group-item"
+                        onClick={() => this.submitVote(answer)}
+                      >
                         {answer.answer}
                       </li>
                     );
@@ -312,14 +315,21 @@ class PlayerHand extends React.Component {
     return (
       <div className="card">
         <div className="card-body">
-          <div className="card-title">
-            <ul>
-              {this.state.cards.map(card => {
-                return <li onClick={() => this.submitCard(card)}>{card}</li>;
-              })}
-            </ul>
-          </div>
+          {/* <div className="card-title"> */}
+          <ul className="list-group list-group-flush">
+            {this.state.cards.map(card => {
+              return (
+                <li
+                  className="list-group-item"
+                  onClick={() => this.submitCard(card)}
+                >
+                  {card}
+                </li>
+              );
+            })}
+          </ul>
         </div>
+        {/* </div> */}
       </div>
     );
   }
