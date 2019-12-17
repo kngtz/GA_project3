@@ -1,8 +1,8 @@
 const { BrowserRouter, Link, Switch, Route, browserHistory } = ReactRouterDOM;
 // var socket = io();
 // import io from "socket.io-client";
-let socket = io(`http://192.168.170.239:3000`);
-// let socket = io(`http://localhost:3000`);
+// let socket = io(`http://192.168.170.239:3000`);
+let socket = io(`http://localhost:3000`);
 
 class Header extends React.Component {
   render() {
@@ -318,28 +318,28 @@ class PlayerHand extends React.Component {
     return (
       <div className="card">
 
-//         {/* <div className="card-body"> */}
-//         {/* <ul className="list-group list-group-flush"> */}
-//         {this.state.cards.map(card => {
-//           return (
-//             <div className="card player-card">
-//               <div className="card-body">
-//                 {this.state.leader ? (
-//                   <p className="card-text">{card}</p>
-//                 ) : (
-//                   <p
-//                     className="card-text"
-//                     onClick={() => this.submitCard(card)}
-//                   >
-//                     {card}
-//                   </p>
-//                 )}
-//               </div>
-//             </div>
-//           );
-//         })}
-//         {/* </ul> */}
-//         {/* </div> */}
+     {/* <div className="card-body">
+       <ul className="list-group list-group-flush">
+      {this.state.cards.map(card => {
+          return (
+            <div className="card player-card">
+              <div className="card-body">
+                {this.state.leader ? (
+                  <p className="card-text">{card}</p>
+                ) : (
+                  <p
+                    className="card-text"
+                    onClick={() => this.submitCard(card)}
+                  >
+                    {card}
+                  </p>
+                )}
+              </div>
+            </div>
+          );
+        })}
+        </ul>
+        </div> */}
 
         <div className="card-body">
           <div className="card-title">
