@@ -311,7 +311,8 @@ class PlayerHand extends React.Component {
           <div className="card-title">
             <ul>
               {this.state.cards.map(card => {
-                return <li onClick={() => this.submitCard(card)}>{card}</li>;
+                return <li className="btn btn-outline-dark pointer bold py-3"
+                onClick={() => this.submitCard(card)}>{card}</li>;
               })}
             </ul>
           </div>
