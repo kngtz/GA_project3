@@ -1,8 +1,8 @@
 const { BrowserRouter, Link, Switch, Route, browserHistory } = ReactRouterDOM;
 // var socket = io();
 // import io from "socket.io-client";
-// let socket = io(`http://192.168.170.239:3000`);
-let socket = io(`http://localhost:3000`);
+let socket = io(`http://192.168.170.239:3000`);
+// let socket = io(`http://localhost:3000`);
 
 class Header extends React.Component {
   render() {
@@ -255,10 +255,13 @@ class GameArea extends React.Component {
             <div className="card-body">
               <div className="card-title">
                 <h3>Answers: </h3>
-                <ul>
+                <ul className="list-group list-group-flush">
                   {this.state.answers.map(answer => {
                     return (
-                      <li onClick={() => this.submitVote(answer)}>
+                      <li
+                        class="list-group-item"
+                        onClick={() => this.submitVote(answer)}
+                      >
                         {answer.answer}
                       </li>
                     );
@@ -284,14 +287,17 @@ class PlayerHand extends React.Component {
     super(props);
     this.state = {
       cards: [],
-      answer: ""
+      answer: "",
+      leader: ""
     };
   }
   componentDidMount() {
     // this.props.socket = io("localhost:3000");
     console.log("PlayerHand-socket:", this.props.socket);
-    this.props.socket.on("CARDS", cards => {
-      this.setState({ cards: cards });
+    this.props.socket.on("CARDS", players => {
+      console.log(players);
+      this.setState({ cards: players.cards });
+      this.setState({ leader: players.leader });
     });
   }
 
@@ -301,7 +307,7 @@ class PlayerHand extends React.Component {
 
   submitCard = card => {
     this.setState({ answer: card }, () => {
-      // console.log(this.state.answer);
+      console.log(this.state.answer);
       this.props.socket.emit("SUBMIT_ANSWER", {
         answer: this.state.answer
       });
@@ -311,6 +317,30 @@ class PlayerHand extends React.Component {
   render() {
     return (
       <div className="card">
+
+//         {/* <div className="card-body"> */}
+//         {/* <ul className="list-group list-group-flush"> */}
+//         {this.state.cards.map(card => {
+//           return (
+//             <div className="card player-card">
+//               <div className="card-body">
+//                 {this.state.leader ? (
+//                   <p className="card-text">{card}</p>
+//                 ) : (
+//                   <p
+//                     className="card-text"
+//                     onClick={() => this.submitCard(card)}
+//                   >
+//                     {card}
+//                   </p>
+//                 )}
+//               </div>
+//             </div>
+//           );
+//         })}
+//         {/* </ul> */}
+//         {/* </div> */}
+
         <div className="card-body">
           <div className="card-title">
             <ul>
@@ -321,6 +351,7 @@ class PlayerHand extends React.Component {
             </ul>
           </div>
         </div>
+
       </div>
     );
   }
