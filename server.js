@@ -161,7 +161,29 @@ io.on("connection", function(socket) {
 
   socket.on("SUBMIT_ANSWER", function(data) {
     console.log(socket.id + ": SUBMIT ANSWER - " + data.answer);
-    submittedAnswer.push({ socketval: socket.username, answer: data.answer });
+    submittedAnswer.push({ socketval: socket.id, answer: data.answer });
+    // findIndex
+    // console.log()
+    for (i = 0; i < gameRoom.players.length; i++) {
+      if (socket.id === gameRoom.players[i].connectionSocket) {
+        gameRoom.players[i].cards.splice(
+          gameRoom.players[i].cards.findIndex(id => id === data.answer),
+          1
+        );
+      }
+      io.to(gameRoom.players[i].connectionSocket).emit(
+        "CARDS",
+        gameRoom.players[i].cards
+      );
+    }
+
+    io.emit;
+
+    // const index = gameRoom.players(x => x.connectionSocket === socket.id);
+    // const index = gameRoom.players
+    //   .keys(connectionSocket)
+    //   .findIndex(id => id === socket.id);
+    // console.log("this is the index " + index);
 
     // console.log("ORIGINAL " + gameRoom.players[0].cards);
     if (submittedAnswer.length == gameRoom.players.length) {
@@ -170,7 +192,7 @@ io.on("connection", function(socket) {
 
       io.emit("SHOW_RESULT", submittedAnswer);
       gameRoom.players[0].cards.splice(0, 1);
-      gameRoom.players[1].cards.splice(0, 1);
+
       // for (i = 0; i < gameRoom.players.length; i++) {
       //   gameRoom.players[i].cards.splice(
       //     gameRoom.players[i].cards.findIndex(
@@ -179,7 +201,6 @@ io.on("connection", function(socket) {
       //     1
       //   );
       // }
-      console.log("SPLICED " + gameRoom.players[0].cards);
     } else {
       console.log("still awaiting answers");
       console.log(submittedAnswer);
@@ -190,6 +211,7 @@ io.on("connection", function(socket) {
     submittedVote.push({ vote: data.vote });
 
     console.log("ORIGINAL " + submittedVote);
+
     if (submittedVote.length == gameRoom.players.length) {
       console.log("all players submitted");
       console.log(submittedVote);
