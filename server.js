@@ -126,6 +126,7 @@ io.on("connection", function(socket) {
     if (!socket.username) {
       console.log("Set user name");
       socket.username = data.username;
+      socket.emit("USERNAME", data.username);
     } else {
       console.log("user is defined");
     }
@@ -165,7 +166,7 @@ io.on("connection", function(socket) {
 
     // if (socket.id !=== ){
   });
- socket.on("START_ROUND", function(data) {
+  socket.on("START_ROUND", function(data) {
     if (flowCheck === 0) {
       for (i = 0; i < gameRoom.players.length; i++) {
         gameRoom.players[i].leader = false;
