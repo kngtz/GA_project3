@@ -100,7 +100,7 @@ const questions = [
     pick: 1
   },
   {
-    text: "War!<br><br>What is it good for?",
+    text: "War!. . What is it good for?",
     pick: 1
   },
   {
@@ -319,7 +319,7 @@ const questions = [
   },
   {
     text:
-      "Dear Abby,<br><br>I'm having some trouble with _ and would like your advice.",
+      "Dear Abby,. . I'm having some trouble with _ and would like your advice.",
     pick: 1
   },
   {
@@ -349,7 +349,7 @@ const questions = [
   },
   {
     text:
-      "Here is the church<br>Here is the steeple<br>Open the doors<br>And there is _.",
+      "Here is the church. Here is the steeple. Open the doors. And there is _.",
     pick: 1
   },
   {
