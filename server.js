@@ -4,7 +4,8 @@ const mongoose = require("mongoose");
 const app = express();
 const db = mongoose.connection;
 const bodyParser = require("body-parser");
-
+const questions = require("./data/questions.js");
+const answers = require("./data/answers.js");
 require("dotenv").config();
 
 var http = require("http").createServer(app);
@@ -37,6 +38,10 @@ app.get("/", function(req, res) {
 //initialise variables
 let numUsers = 0;
 let userArray = [];
+let submittedAnswer = [];
+let submittedString = [];
+let submittedVote = [];
+let leaderCounter = 0;
 var gameRoom = {
   Name: "Room 1",
   players: [],
@@ -59,7 +64,16 @@ var gameRoom = {
     "Spending the year's insulin budget on Warhammer 40k figurines.",
     "The depression that ensues after catching 'em all.",
     "The rocket launcher.",
-    "Violating the First Law of Robotics."
+    "Violating the First Law of Robotics.",
+    "Action stations! Action stations! Set condition one throughout the fleet and brace for ______!",
+    "In the final round of this year's Omegathon, Omeganauts must face off in a game of ______.",
+    "______ is the universe’s way of saying I need to stay away from ______.",
+    "______? Fuggedaboutit!",
+    "______. Changes. Everything.",
+    "5, 4, 3, 2, 1, ______!",
+    "Ain’t it nifty?! Bob and Barb hit 50, so get off your ass and raise a glass to 50 years of ______.",
+    "Coming to Red Lobster this month, ______.",
+    "Here’s a little something I learned in business school: The customer is always ______."
   ]
 };
 
@@ -115,9 +129,8 @@ io.on("connection", function(socket) {
   // CHAT BOX FUNCTION ===============================================================================
 
   socket.on("SEND_USERNAME", function(data) {
-    console.log(socket.id + ": SEND USERNAME - " + data.username);
     socket.username = data.username;
-    console.log("socket username is " + socket.username);
+
     socket.emit("USERNAME", data.username);
   });
   socket.on("JOIN_GAME", function(data) {
@@ -125,40 +138,85 @@ io.on("connection", function(socket) {
       connectionSocket: socket.id,
       name: socket.username,
       cards: [],
-      score: 0
+      score: 0,
+      leader: false
     });
-    console.log(socket.id + ": JOIN GAME - " + data);
-    console.log(gameRoom);
-    console.log(gameRoom.players[0]);
+    console.log("JOIN GAME");
     io.emit("ROOM_PLAYERS", gameRoom.players);
   });
   socket.on("START_ROUND", function(data) {
-    console.log(socket.id + ": START ROUND - " + data);
-    io.emit("QUESTION", gameRoom.questions[0]);
-    gameRoom.questions.splice(0, 1);
-    console.log(gameRoom.players.length);
     for (i = 0; i < gameRoom.players.length; i++) {
-      var userCardArray = []; // push cards here to emit to user to give them their 7 cards.
-      console.log(socket.id + ": ASSIGN CARDS - ");
-      for (n = gameRoom.players[i].cards.length; n < 5; n++) {
-        console.log("counter" + n);
-        userCardArray.push(gameRoom.answers[0]);
-        gameRoom.answers.splice(0, 1);
+      gameRoom.players[i].leader = false;
+    }
+    gameRoom.players[leaderCounter].leader = true;
+    leaderCounter++;
+    submittedAnswer = [];
+    submittedString = [];
+    io.emit("CLEAR_RESULT", {
+      submittedAnswer: submittedAnswer,
+      leader: gameRoom.players
+    });
+
+    io.emit("QUESTION", questions[20].text);
+    questions.splice(0, 1);
+
+    for (i = 0; i < gameRoom.players.length; i++) {
+      for (n = gameRoom.players[i].cards.length; n < 7; n++) {
+        gameRoom.players[i].cards.push(answers[0]);
+        answers.splice(0, 1);
       }
-      io.to(gameRoom.players[i].connectionSocket).emit("CARDS", userCardArray);
+      io.to(gameRoom.players[i].connectionSocket).emit(
+        "CARDS",
+        // gameRoom.players[i]
+        { cards: gameRoom.players[i].cards, leader: gameRoom.players[i].leader }
+      );
     }
   });
 
-  socket.on("ANSWER", function(data) {
-    // FUNCTION TO ASSIGN 7 CARDS TO EACH PLAYER. numCards variable to simulate how many cards they have in their hand.
-    var userCardArray = []; // push cards here to emit to user to give them their 7 cards.
-    console.log(socket.id + ": ANSWER - " + data.numCards);
-    for (i = data.numCards; i < 7; i++) {
-      console.log("counter" + i);
-      userCardArray.push(gameRoom.answers[0]);
-      gameRoom.answers.splice(0, 1);
+  socket.on("SUBMIT_ANSWER", function(data) {
+    console.log(socket.id + ": SUBMIT ANSWER - " + data.answer);
+    submittedAnswer.push({ socketval: socket.id, answer: data.answer });
+    submittedString.push(data.answer);
+    for (i = 0; i < gameRoom.players.length; i++) {
+      if (socket.id === gameRoom.players[i].connectionSocket) {
+        gameRoom.players[i].cards.splice(
+          gameRoom.players[i].cards.findIndex(id => id === data.answer),
+          1
+        );
+      }
+      io.to(gameRoom.players[i].connectionSocket).emit("CARDS", {
+        cards: gameRoom.players[i].cards,
+        leader: gameRoom.players[i].leader
+      });
     }
-    socket.emit("ANSWER", userCardArray);
+
+    if (submittedAnswer.length == gameRoom.players.length - 1) {
+      console.log("all players submitted");
+      console.log(submittedString);
+
+      io.emit("SHOW_RESULT", submittedString);
+    } else {
+      console.log("still awaiting answers");
+      console.log(submittedAnswer);
+    }
+  });
+  socket.on("SUBMIT_VOTE", function(data) {
+    console.log(socket.id + ": SUBMIT VOTE - " + data.vote);
+
+    for (i = 0; i < gameRoom.players.length; i++) {
+      gameRoom.players[i].cards.findIndex(id => id === data.vote);
+    }
+    // submittedVote.push({ vote: data.vote });
+
+    // if (submittedVote.length == gameRoom.players.length) {
+    //   console.log("all players submitted");
+    //   console.log(submittedVote);
+
+    //   io.emit("SHOW_VOTES", submittedVote);
+    // } else {
+    //   console.log("still awaiting votes");
+    //   console.log(submittedVote);
+    // }
   });
   socket.on("disconnect", function() {
     numUsers--;
@@ -170,26 +228,6 @@ io.on("connection", function(socket) {
     console.log("Users online : " + numUsers);
   });
 });
-
-// io.on("connection", socket => {
-//   socket.join("room 237", () => {
-//     numUsers++;
-//     console.log("Users online : " + numUsers);
-//     let rooms = Object.keys(socket.rooms);
-//     console.log(rooms); // [ <socket.id>, 'room 237' ]
-//     socket.on("disconnect", function() {
-//       numUsers--;
-//       console.log("Users online : " + numUsers);
-//     });
-//   });
-// });
-
-// var numclients = io.sockets.adapter.rooms["room 237"];
-// console.log(numclients.length);
-
-// app.listen(PORT, () => {
-//   console.log("Let's get things done on port", PORT);
-// });
 
 http.listen(3000, function() {
   console.log("listening on *:3000");
