@@ -258,11 +258,14 @@ class GameArea extends React.Component {
     });
   }
 
-  submitVote = answer => {
-    this.setState({ vote: answer }, () => {
-      this.props.socket.emit("SUBMIT_VOTE", {
-        vote: this.state.vote
-      });
+  selectCard = answer => {
+    this.setState({ vote: answer });
+    console.log(this.state.vote);
+  };
+
+  submitVote = () => {
+    this.props.socket.emit("SUBMIT_VOTE", {
+      vote: this.state.vote
     });
   };
 
@@ -281,20 +284,25 @@ class GameArea extends React.Component {
           <hr />
           <div className="card">
             <div className="card-body">
-              <div className="card-title">
-                <h3>Answers: </h3>
-                <ul className="list-group list-group-flush">
-                  {this.state.answers.map(answer => {
-                    return (
-                      <li
-                        class="list-group-item"
-                        onClick={() => this.submitVote(answer)}
-                      >
-                        {answer}
-                      </li>
-                    );
-                  })}
-                </ul>
+              <h3>Answers: </h3>
+              <div className="card-title player-card">
+                {this.state.answers.map(answer => {
+                  return (
+                    <div
+                      className={`card-body btn btn-outline-dark pointer bold py-3 ${
+                        answer === this.state.vote ? "bg-primary" : ""
+                      }`}
+                    >
+                      <p onClick={() => this.selectCard(answer)}>{answer}</p>
+                    </div>
+                  );
+                })}
+                <button
+                  className="btn btn-primary form-control"
+                  onClick={() => this.submitVote()}
+                >
+                  Submit Vote
+                </button>
               </div>
             </div>
           </div>
@@ -345,11 +353,11 @@ class PlayerHand extends React.Component {
   render() {
     return (
       <div className="card">
-        <div className="card-body">
-          <div className="card-title">
+        <div className="card-body player-array">
+          <div className="card-title player-card">
             {this.state.cards.map(card => {
               return (
-                <div className="card player-card">
+                <div className="card card-card">
                   <div
                     className={`card-body btn btn-outline-dark pointer bold py-3 ${
                       card === this.state.answer ? "bg-primary" : ""
@@ -369,8 +377,13 @@ class PlayerHand extends React.Component {
                 </div>
               );
             })}
-            <button onClick={() => this.submitCard()}>Submit Answer</button>
           </div>
+          <button
+            className="btn btn-primary form-control"
+            onClick={() => this.submitCard()}
+          >
+            Submit Answer
+          </button>
         </div>
       </div>
     );
@@ -413,11 +426,7 @@ class App extends React.Component {
           </div>
           <div class="row">
             <div class="col-8">
-              <GameArea
-                // questions={questions}
-                // random={this.state.randomQuestion}
-                socket={socket}
-              />
+              <GameArea socket={socket} />
             </div>
 
             <div class="col-4">
@@ -429,11 +438,7 @@ class App extends React.Component {
 
           <div class="row">
             <div class="col-12">
-              <PlayerHand
-                // answers={answers}
-                // random={this.state.randomAnswer}
-                socket={socket}
-              />
+              <PlayerHand socket={socket} />
             </div>
           </div>
 

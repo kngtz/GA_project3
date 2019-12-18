@@ -165,7 +165,7 @@ io.on("connection", function(socket) {
 
     // if (socket.id !=== ){
   });
-  socket.on("START_ROUND", function(data) {
+ socket.on("START_ROUND", function(data) {
     if (flowCheck === 0) {
       for (i = 0; i < gameRoom.players.length; i++) {
         gameRoom.players[i].leader = false;
