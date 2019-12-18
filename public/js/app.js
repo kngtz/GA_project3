@@ -9,6 +9,23 @@ class Header extends React.Component {
     return <h1> Cards Against Humanity </h1>;
   }
 }
+class Subheader extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      players: []
+    };
+  }
+
+  render() {
+    return (
+      <div className="card">
+        {/* to move this out of scoreboard eventually */}
+        <SubmitUser socket={this.props.socket} />
+      </div>
+    );
+  }
+}
 
 // Chat Box
 class ChatBox extends React.Component {
@@ -126,8 +143,6 @@ class ScoreBoard extends React.Component {
                 );
               })}
             </div>
-            {/* to move this out of scoreboard eventually */}
-            <SubmitUser socket={this.props.socket} />
           </div>
         </div>
       </div>
@@ -175,33 +190,40 @@ class SubmitUser extends React.Component {
   render() {
     return (
       <div>
-        <input
-          type="text"
-          placeholder="Username"
-          name="username"
-          className="form-control"
-          value={this.state.username}
-          onChange={this.handleChange}
-        />
-
-        <button
-          onClick={this.sendUsername}
-          className="btn btn-primary form-control"
-        >
-          Submit Username
-        </button>
-        <button
-          onClick={this.joinGame}
-          className="btn btn-primary form-control"
-        >
-          Join Game
-        </button>
-        <button
-          onClick={this.startRound}
-          className="btn btn-primary form-control"
-        >
-          Start Round
-        </button>
+        <nav class="navbar navbar-light bg-light">
+          <form class="form-inline">
+            <input
+              type="text"
+              placeholder="Username"
+              name="username"
+              className="form-control"
+              value={this.state.username}
+              onChange={this.handleChange}
+            />
+            <button
+              onClick={this.sendUsername}
+              className="btn btn-primary form-control"
+            >
+              Submit Username
+            </button>
+          </form>
+          <form class="form-inline">
+            <button
+              onClick={this.joinGame}
+              className="btn btn-primary form-control"
+            >
+              Join Game
+            </button>
+          </form>
+          <form class="form-inline">
+            <button
+              onClick={this.startRound}
+              className="btn btn-primary form-control"
+            >
+              Start Round
+            </button>
+          </form>
+        </nav>
       </div>
     );
   }
@@ -392,6 +414,11 @@ class App extends React.Component {
           <div class="row">
             <div class="col-12">
               <Header />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <Subheader socket={socket} />
             </div>
           </div>
           <div class="row">
