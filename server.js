@@ -42,6 +42,7 @@ let numUsers = 0;
 let userArray = [];
 let submittedAnswer = [];
 let submittedVote = [];
+let leaderCounter = 0;
 var gameRoom = {
   Name: "Room 1",
   players: [],
@@ -138,50 +139,61 @@ io.on("connection", function(socket) {
       connectionSocket: socket.id,
       name: socket.username,
       cards: [],
-      score: 0
+      score: 0,
+      leader: false
     });
     console.log("JOIN GAME");
     io.emit("ROOM_PLAYERS", gameRoom.players);
   });
   socket.on("START_ROUND", function(data) {
+    for (i = 0; i < gameRoom.players.length; i++) {
+      gameRoom.players[i].leader = false;
+    }
+    gameRoom.players[leaderCounter].leader = true;
+    leaderCounter++;
     submittedAnswer = [];
-    io.emit("SHOW_RESULT", submittedAnswer);
+    io.emit("SHOW_RESULT", {
+      submittedAnswer: submittedAnswer,
+      leader: gameRoom.players
+    });
     io.emit("QUESTION", questions[20].text);
     questions.splice(0, 1);
 
     for (i = 0; i < gameRoom.players.length; i++) {
-      for (n = gameRoom.players[i].cards.length; n < 5; n++) {
+      for (n = gameRoom.players[i].cards.length; n < 7; n++) {
         gameRoom.players[i].cards.push(answers[0]);
         answers.splice(0, 1);
       }
       io.to(gameRoom.players[i].connectionSocket).emit(
         "CARDS",
-        gameRoom.players[i].cards
+        // gameRoom.players[i]
+        { cards: gameRoom.players[i].cards, leader: gameRoom.players[i].leader }
       );
     }
   });
 
   socket.on("SUBMIT_ANSWER", function(data) {
     console.log(socket.id + ": SUBMIT ANSWER - " + data.answer);
-    submittedAnswer.push({ socketval: socket.username, answer: data.answer });
+    submittedAnswer.push({ socketval: socket.id, answer: data.answer });
 
-    // console.log("ORIGINAL " + gameRoom.players[0].cards);
-    if (submittedAnswer.length == gameRoom.players.length) {
+    for (i = 0; i < gameRoom.players.length; i++) {
+      if (socket.id === gameRoom.players[i].connectionSocket) {
+        gameRoom.players[i].cards.splice(
+          gameRoom.players[i].cards.findIndex(id => id === data.answer),
+          1
+        );
+      }
+      io.to(gameRoom.players[i].connectionSocket).emit("CARDS", {
+        cards: gameRoom.players[i].cards,
+        leader: gameRoom.players[i].leader
+      });
+    }
+
+    if (submittedAnswer.length == gameRoom.players.length - 1) {
       console.log("all players submitted");
       console.log(submittedAnswer);
 
       io.emit("SHOW_RESULT", submittedAnswer);
-      gameRoom.players[0].cards.splice(0, 1);
-      gameRoom.players[1].cards.splice(0, 1);
-      // for (i = 0; i < gameRoom.players.length; i++) {
-      //   gameRoom.players[i].cards.splice(
-      //     gameRoom.players[i].cards.findIndex(
-      //       cards => cards === submittedAnswer.map(answer)
-      //     ),
-      //     1
-      //   );
-      // }
-      console.log("SPLICED " + gameRoom.players[0].cards);
     } else {
       console.log("still awaiting answers");
       console.log(submittedAnswer);
@@ -189,26 +201,21 @@ io.on("connection", function(socket) {
   });
   socket.on("SUBMIT_VOTE", function(data) {
     console.log(socket.id + ": SUBMIT VOTE - " + data.vote);
-    submittedVote.push({ vote: data.vote });
 
-    console.log("ORIGINAL " + submittedVote);
-    if (submittedVote.length == gameRoom.players.length) {
-      console.log("all players submitted");
-      console.log(submittedVote);
-
-      io.emit("SHOW_VOTES", submittedVote);
-      // for (i = 0; i < gameRoom.players.length; i++) {
-      //   gameRoom.players[i].cards.splice(
-      //     gameRoom.players[i].cards.findIndex(
-      //       cards => cards === submittedAnswer.map(answer)
-      //     ),
-      //     1
-      //   );
-      // }
-    } else {
-      console.log("still awaiting votes");
-      console.log(submittedVote);
+    for (i = 0; i < gameRoom.players.length; i++) {
+      gameRoom.players[i].cards.findIndex(id => id === data.vote);
     }
+    // submittedVote.push({ vote: data.vote });
+
+    // if (submittedVote.length == gameRoom.players.length) {
+    //   console.log("all players submitted");
+    //   console.log(submittedVote);
+
+    //   io.emit("SHOW_VOTES", submittedVote);
+    // } else {
+    //   console.log("still awaiting votes");
+    //   console.log(submittedVote);
+    // }
   });
   socket.on("disconnect", function() {
     numUsers--;
@@ -220,26 +227,6 @@ io.on("connection", function(socket) {
     console.log("Users online : " + numUsers);
   });
 });
-
-// io.on("connection", socket => {
-//   socket.join("room 237", () => {
-//     numUsers++;
-//     console.log("Users online : " + numUsers);
-//     let rooms = Object.keys(socket.rooms);
-//     console.log(rooms); // [ <socket.id>, 'room 237' ]
-//     socket.on("disconnect", function() {
-//       numUsers--;
-//       console.log("Users online : " + numUsers);
-//     });
-//   });
-// });
-
-// var numclients = io.sockets.adapter.rooms["room 237"];
-// console.log(numclients.length);
-
-// app.listen(PORT, () => {
-//   console.log("Let's get things done on port", PORT);
-// });
 
 http.listen(3000, function() {
   console.log("listening on *:3000");
