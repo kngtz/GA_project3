@@ -147,7 +147,7 @@ io.on("connection", function(socket) {
     submittedString = [];
     io.emit("CLEAR_RESULT", {
       submittedAnswer: submittedAnswer,
-      leader: gameRoom.players
+      players: gameRoom.players
     });
 
     io.emit("QUESTION", gameRoom.questions[0].text);
