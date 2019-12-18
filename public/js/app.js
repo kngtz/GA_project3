@@ -107,6 +107,9 @@ class ScoreBoard extends React.Component {
     this.props.socket.on("ROOM_PLAYERS", players => {
       this.setState({ players: players });
     });
+    this.props.socket.on("SHOW_VOTE", players => {
+      this.setState({ players: players });
+    });
   }
   render() {
     return (
@@ -234,7 +237,7 @@ class GameArea extends React.Component {
   }
 
   submitVote = answer => {
-    this.setState({ vote: answer.answer }, () => {
+    this.setState({ vote: answer }, () => {
       this.props.socket.emit("SUBMIT_VOTE", {
         vote: this.state.vote
       });

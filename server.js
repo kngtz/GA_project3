@@ -199,7 +199,7 @@ io.on("connection", function(socket) {
 
     for (i = 0; i < submittedAnswer.length; i++) {
       console.log("first for");
-      if (submittedAnswer[i].answer === data.answer) {
+      if (submittedAnswer[i].answer === data.vote) {
         console.log("first if");
         for (n = 0; n < gameRoom.players.length; n++) {
           console.log("second for");
