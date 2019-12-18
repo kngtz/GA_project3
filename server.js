@@ -34,6 +34,26 @@ app.use(express.static("public"));
 app.get("/", function(req, res) {
   res.sendFile(__dirname + "/index.html");
 });
+var shuffle = function(array) {
+  var currentIndex = array.length;
+  var temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+};
+shuffle(answers);
+shuffle(questions);
 
 //initialise variables
 let numUsers = 0;
@@ -42,41 +62,14 @@ let submittedAnswer = [];
 let submittedString = [];
 let submittedVote = [];
 let leaderCounter = 0;
+
 var gameRoom = {
   Name: "Room 1",
   players: [],
-  questions: [
-    "Action stations! Action stations! Set condition one throughout the fleet and brace for ______!",
-    "In the final round of this year's Omegathon, Omeganauts must face off in a game of ______.",
-    "______ is the universe’s way of saying I need to stay away from ______.",
-    "______? Fuggedaboutit!",
-    "______. Changes. Everything.",
-    "5, 4, 3, 2, 1, ______!",
-    "Ain’t it nifty?! Bob and Barb hit 50, so get off your ass and raise a glass to 50 years of ______.",
-    "Coming to Red Lobster this month, ______.",
-    "Here’s a little something I learned in business school: The customer is always ______."
-  ],
-  answers: [
-    "Getting inside the Horadric Cube with a hot babe and pressing the transmute button.",
-    "Loading from a previous save.",
-    "Punching a tree to gather wood.",
-    "Sharpening a foam broadsword on a foam whetstone.",
-    "Spending the year's insulin budget on Warhammer 40k figurines.",
-    "The depression that ensues after catching 'em all.",
-    "The rocket launcher.",
-    "Violating the First Law of Robotics.",
-    "Action stations! Action stations! Set condition one throughout the fleet and brace for ______!",
-    "In the final round of this year's Omegathon, Omeganauts must face off in a game of ______.",
-    "______ is the universe’s way of saying I need to stay away from ______.",
-    "______? Fuggedaboutit!",
-    "______. Changes. Everything.",
-    "5, 4, 3, 2, 1, ______!",
-    "Ain’t it nifty?! Bob and Barb hit 50, so get off your ass and raise a glass to 50 years of ______.",
-    "Coming to Red Lobster this month, ______.",
-    "Here’s a little something I learned in business school: The customer is always ______."
-  ]
+  questions: questions,
+  answers: answers
 };
-
+console.log("THIS IS " + gameRoom.answers[0]);
 // Routes
 const todosController = require("./controllers/todos.js");
 app.use("/todos", todosController);
@@ -157,13 +150,13 @@ io.on("connection", function(socket) {
       leader: gameRoom.players
     });
 
-    io.emit("QUESTION", questions[20].text);
-    questions.splice(0, 1);
+    io.emit("QUESTION", gameRoom.questions[0].text);
+    gameRoom.questions.splice(0, 1);
 
     for (i = 0; i < gameRoom.players.length; i++) {
       for (n = gameRoom.players[i].cards.length; n < 7; n++) {
-        gameRoom.players[i].cards.push(answers[0]);
-        answers.splice(0, 1);
+        gameRoom.players[i].cards.push(gameRoom.answers[0]);
+        gameRoom.answers.splice(0, 1);
       }
       io.to(gameRoom.players[i].connectionSocket).emit(
         "CARDS",
