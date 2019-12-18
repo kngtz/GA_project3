@@ -23,7 +23,7 @@ class ChatBox extends React.Component {
 
   componentDidMount() {
     // this.props.socket = io("localhost:3000");
-    console.log("ChatBox-socket:", this.props.socket);
+
     this.props.socket.on("RECEIVE_MESSAGE", data => {
       this.addMessage(data);
     });
@@ -98,15 +98,13 @@ class ScoreBoard extends React.Component {
   }
   componentDidMount() {
     // this.props.socket = io("localhost:3000");
-    console.log("ScoreBoard-socket:", this.props.socket);
+
     // this.props.socket.on("USERNAME", username => {
-    //   console.log("username is " + username);
+
     //   this.setState({ username: username });
     // });
 
     this.props.socket.on("ROOM_PLAYERS", players => {
-      console.log("username is " + players);
-
       this.setState({ players: players });
     });
   }
@@ -146,7 +144,6 @@ class SubmitUser extends React.Component {
   componentDidMount() {
     // this.props.socket = io("localhost:3000");
     this.props.socket.on("USERNAME", username => {
-      console.log("SubmitUser-username is " + username);
       this.setState({ username: username });
     });
   }
@@ -220,18 +217,24 @@ class GameArea extends React.Component {
   }
   componentDidMount() {
     // this.props.socket = io("localhost:3000");
-    console.log("GameArea-socket:", this.props.socket);
+
     this.props.socket.on("QUESTION", question => {
       this.setState({ question: question });
     });
-    this.props.socket.on("SHOW_RESULT", submittedAnswer => {
-      this.setState({ answers: submittedAnswer });
+    this.props.socket.on("CLEAR_RESULT", data => {
+      console.log("ENTERED");
+      console.log(data.submittedAnswer);
+      this.setState({ answers: data.submittedAnswer });
+    });
+    this.props.socket.on("SHOW_RESULT", data => {
+      console.log("ENTEererRED");
+      console.log(data);
+      this.setState({ answers: data });
     });
   }
 
   submitVote = answer => {
     this.setState({ vote: answer.answer }, () => {
-      console.log(this.state.answer);
       this.props.socket.emit("SUBMIT_VOTE", {
         vote: this.state.vote
       });
@@ -262,7 +265,7 @@ class GameArea extends React.Component {
                         class="list-group-item"
                         onClick={() => this.submitVote(answer)}
                       >
-                        {answer.answer}
+                        {answer}
                       </li>
                     );
                   })}
@@ -293,9 +296,8 @@ class PlayerHand extends React.Component {
   }
   componentDidMount() {
     // this.props.socket = io("localhost:3000");
-    console.log("PlayerHand-socket:", this.props.socket);
+
     this.props.socket.on("CARDS", players => {
-      console.log(players);
       this.setState({ cards: players.cards });
       this.setState({ leader: players.leader });
     });
@@ -307,7 +309,6 @@ class PlayerHand extends React.Component {
 
   submitCard = card => {
     this.setState({ answer: card }, () => {
-      console.log(this.state.answer);
       this.props.socket.emit("SUBMIT_ANSWER", {
         answer: this.state.answer
       });
@@ -317,8 +318,7 @@ class PlayerHand extends React.Component {
   render() {
     return (
       <div className="card">
-
-     {/* <div className="card-body">
+        {/* <div className="card-body">
        <ul className="list-group list-group-flush">
       {this.state.cards.map(card => {
           return (
@@ -345,13 +345,18 @@ class PlayerHand extends React.Component {
           <div className="card-title">
             <ul>
               {this.state.cards.map(card => {
-                return <li className="btn btn-outline-dark pointer bold py-3"
-                onClick={() => this.submitCard(card)}>{card}</li>;
+                return (
+                  <li
+                    className="btn btn-outline-dark pointer bold py-3"
+                    onClick={() => this.submitCard(card)}
+                  >
+                    {card}
+                  </li>
+                );
               })}
             </ul>
           </div>
         </div>
-
       </div>
     );
   }
@@ -374,7 +379,6 @@ class App extends React.Component {
   }
   componentDidMount() {
     socket.on("connection", data => {
-      console.log("hello");
       this.setState({ data });
     });
   }

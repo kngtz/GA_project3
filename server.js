@@ -8,8 +8,6 @@ const questions = require("./data/questions.js");
 const answers = require("./data/answers.js");
 require("dotenv").config();
 
-console.log(answers[0]);
-
 var http = require("http").createServer(app);
 var io = require("socket.io")(http);
 
@@ -41,6 +39,7 @@ app.get("/", function(req, res) {
 let numUsers = 0;
 let userArray = [];
 let submittedAnswer = [];
+let submittedString = [];
 let submittedVote = [];
 let leaderCounter = 0;
 var gameRoom = {
@@ -152,10 +151,12 @@ io.on("connection", function(socket) {
     gameRoom.players[leaderCounter].leader = true;
     leaderCounter++;
     submittedAnswer = [];
-    io.emit("SHOW_RESULT", {
+    submittedString = [];
+    io.emit("CLEAR_RESULT", {
       submittedAnswer: submittedAnswer,
       leader: gameRoom.players
     });
+
     io.emit("QUESTION", questions[20].text);
     questions.splice(0, 1);
 
@@ -175,7 +176,7 @@ io.on("connection", function(socket) {
   socket.on("SUBMIT_ANSWER", function(data) {
     console.log(socket.id + ": SUBMIT ANSWER - " + data.answer);
     submittedAnswer.push({ socketval: socket.id, answer: data.answer });
-
+    submittedString.push(data.answer);
     for (i = 0; i < gameRoom.players.length; i++) {
       if (socket.id === gameRoom.players[i].connectionSocket) {
         gameRoom.players[i].cards.splice(
@@ -191,9 +192,9 @@ io.on("connection", function(socket) {
 
     if (submittedAnswer.length == gameRoom.players.length - 1) {
       console.log("all players submitted");
-      console.log(submittedAnswer);
+      console.log(submittedString);
 
-      io.emit("SHOW_RESULT", submittedAnswer);
+      io.emit("SHOW_RESULT", submittedString);
     } else {
       console.log("still awaiting answers");
       console.log(submittedAnswer);
