@@ -332,54 +332,44 @@ class PlayerHand extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   };
 
-  submitCard = card => {
-    this.setState({ answer: card }, () => {
-      this.props.socket.emit("SUBMIT_ANSWER", {
-        answer: this.state.answer
-      });
+  selectCard = card => {
+    this.setState({ answer: card });
+  };
+
+  submitCard = () => {
+    this.props.socket.emit("SUBMIT_ANSWER", {
+      answer: this.state.answer
     });
   };
 
   render() {
     return (
       <div className="card">
-        {/* <div className="card-body">
-       <ul className="list-group list-group-flush">
-      {this.state.cards.map(card => {
-          return (
-            <div className="card player-card">
-              <div className="card-body">
-                {this.state.leader ? (
-                  <p className="card-text">{card}</p>
-                ) : (
-                  <p
-                    className="card-text"
-                    onClick={() => this.submitCard(card)}
-                  >
-                    {card}
-                  </p>
-                )}
-              </div>
-            </div>
-          );
-        })}
-        </ul>
-        </div> */}
-
         <div className="card-body">
           <div className="card-title">
-            <ul>
-              {this.state.cards.map(card => {
-                return (
-                  <li
-                    className="btn btn-outline-dark pointer bold py-3"
-                    onClick={() => this.submitCard(card)}
+            {this.state.cards.map(card => {
+              return (
+                <div className="card player-card">
+                  <div
+                    className={`card-body btn btn-outline-dark pointer bold py-3 ${
+                      card === this.state.answer ? "bg-primary" : ""
+                    }`}
                   >
-                    {card}
-                  </li>
-                );
-              })}
-            </ul>
+                    {this.state.leader ? (
+                      <p className="card-text">{card}</p>
+                    ) : (
+                      <p
+                        className="card-text"
+                        onClick={() => this.selectCard(card)}
+                      >
+                        {card}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+            <button onClick={() => this.submitCard()}>Submit Answer</button>
           </div>
         </div>
       </div>

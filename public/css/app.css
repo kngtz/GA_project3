@@ -39,6 +39,20 @@ input[type="text"] {
   padding: 0.5em;
 }
 
+.messages {
+  width: 100%;
+  height: 200px;
+  max-height: 200px;
+
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: column nowrap;
+  flex-flow: column nowrap;
+
+  overflow-y: scroll;
+  flex: 1 auto;
+}
+
 /* .scoreboard {
   display: flex;
   flex-flow: column nowrap;
