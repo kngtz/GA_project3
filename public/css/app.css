@@ -39,6 +39,20 @@ input[type="text"] {
   padding: 0.5em;
 }
 
+.messages {
+  width: 100%;
+  height: 200px;
+  max-height: 200px;
+
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: column nowrap;
+  flex-flow: column nowrap;
+
+  overflow-y: scroll;
+  flex: 1 auto;
+}
+
 /* .scoreboard {
   display: flex;
   flex-flow: column nowrap;
@@ -72,7 +86,20 @@ table {
   color: var(--pale-silver);
 }
 
+.player-array {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .player-card {
-  width: 20%;
-  height: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.card-card {
+  width: 250px;
+  height: 150px;
 }

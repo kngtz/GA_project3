@@ -34,6 +34,7 @@ app.use(express.static("public"));
 app.get("/", function(req, res) {
   res.sendFile(__dirname + "/index.html");
 });
+
 var shuffle = function(array) {
   var currentIndex = array.length;
   var temporaryValue, randomIndex;
@@ -62,6 +63,7 @@ let submittedAnswer = [];
 let submittedString = [];
 let submittedVote = [];
 let leaderCounter = 0;
+let flowCheck = 0;
 
 var gameRoom = {
   Name: "Room 1",
@@ -69,10 +71,8 @@ var gameRoom = {
   questions: questions,
   answers: answers
 };
-console.log("THIS IS " + gameRoom.answers[0]);
+
 // Routes
-const todosController = require("./controllers/todos.js");
-app.use("/todos", todosController);
 
 app.get("/seedq", (req, res) => {
   question.create(
@@ -100,6 +100,7 @@ app.get("*", (req, res) => {
 });
 
 io.on("connection", function(socket) {
+  console.log("this is the socket username" + socket.username);
   numUsers++;
   userArray.push(socket.id);
 
@@ -122,54 +123,89 @@ io.on("connection", function(socket) {
   // CHAT BOX FUNCTION ===============================================================================
 
   socket.on("SEND_USERNAME", function(data) {
-    socket.username = data.username;
+    if (!socket.username) {
+      console.log("Set user name");
+      socket.username = data.username;
+      socket.emit("USERNAME", data.username);
+    } else {
+      console.log("user is defined");
+    }
 
-    socket.emit("USERNAME", data.username);
+    //socket.emit("USERNAME", data.username);
   });
   socket.on("JOIN_GAME", function(data) {
-    gameRoom.players.push({
-      connectionSocket: socket.id,
-      name: socket.username,
-      cards: [],
-      score: 0,
-      leader: false
-    });
-    console.log("JOIN GAME");
-    io.emit("ROOM_PLAYERS", gameRoom.players);
+    var index = gameRoom.players.findIndex(
+      p => p.connectionSocket == socket.id
+    );
+    console.log(index);
+    if (gameRoom.players.length === 0) {
+      console.log("First if in join game");
+      gameRoom.players.push({
+        connectionSocket: socket.id,
+        name: socket.username,
+        cards: [],
+        score: 0,
+        leader: false
+      });
+      console.log("JOIN GAME");
+      io.emit("ROOM_PLAYERS", gameRoom.players);
+    } else if (index < 0) {
+      console.log("Second if in join game");
+      gameRoom.players.push({
+        connectionSocket: socket.id,
+        name: socket.username,
+        cards: [],
+        score: 0,
+        leader: false
+      });
+      console.log("JOIN GAME");
+      io.emit("ROOM_PLAYERS", gameRoom.players);
+    } else {
+      console.log("player is already in the game");
+    }
+
+    // if (socket.id !=== ){
   });
   socket.on("START_ROUND", function(data) {
-    for (i = 0; i < gameRoom.players.length; i++) {
-      gameRoom.players[i].leader = false;
-    }
-    gameRoom.players[leaderCounter].leader = true;
-    leaderCounter++;
-    submittedAnswer = [];
-    submittedString = [];
-    io.emit("CLEAR_RESULT", {
-      submittedAnswer: submittedAnswer,
-      leader: gameRoom.players
-    });
-
-    io.emit("QUESTION", gameRoom.questions[0].text);
-    gameRoom.questions.splice(0, 1);
-
-    for (i = 0; i < gameRoom.players.length; i++) {
-      for (n = gameRoom.players[i].cards.length; n < 7; n++) {
-        gameRoom.players[i].cards.push(gameRoom.answers[0]);
-        gameRoom.answers.splice(0, 1);
+    if (flowCheck === 0) {
+      for (i = 0; i < gameRoom.players.length; i++) {
+        gameRoom.players[i].leader = false;
       }
-      io.to(gameRoom.players[i].connectionSocket).emit(
-        "CARDS",
-        // gameRoom.players[i]
-        { cards: gameRoom.players[i].cards, leader: gameRoom.players[i].leader }
-      );
+      gameRoom.players[leaderCounter].leader = true;
+      leaderCounter++;
+      submittedAnswer = [];
+      submittedString = [];
+      io.emit("CLEAR_RESULT", {
+        submittedAnswer: submittedAnswer,
+        players: gameRoom.players
+      });
+
+      io.emit("QUESTION", gameRoom.questions[0].text);
+      gameRoom.questions.splice(0, 1);
+
+      for (i = 0; i < gameRoom.players.length; i++) {
+        for (n = gameRoom.players[i].cards.length; n < 7; n++) {
+          gameRoom.players[i].cards.push(gameRoom.answers[0]);
+          gameRoom.answers.splice(0, 1);
+        }
+        io.to(gameRoom.players[i].connectionSocket).emit(
+          "CARDS",
+          // gameRoom.players[i]
+          {
+            cards: gameRoom.players[i].cards,
+            leader: gameRoom.players[i].leader
+          }
+        );
+      }
     }
   });
 
   socket.on("SUBMIT_ANSWER", function(data) {
     console.log(socket.id + ": SUBMIT ANSWER - " + data.answer);
+
     submittedAnswer.push({ socketval: socket.id, answer: data.answer });
     submittedString.push(data.answer);
+
     for (i = 0; i < gameRoom.players.length; i++) {
       if (socket.id === gameRoom.players[i].connectionSocket) {
         gameRoom.players[i].cards.splice(
@@ -190,15 +226,30 @@ io.on("connection", function(socket) {
       io.emit("SHOW_RESULT", submittedString);
     } else {
       console.log("still awaiting answers");
-      console.log(submittedAnswer);
     }
   });
   socket.on("SUBMIT_VOTE", function(data) {
     console.log(socket.id + ": SUBMIT VOTE - " + data.vote);
 
-    for (i = 0; i < gameRoom.players.length; i++) {
-      gameRoom.players[i].cards.findIndex(id => id === data.vote);
+    for (i = 0; i < submittedAnswer.length; i++) {
+      console.log("first for");
+      if (submittedAnswer[i].answer === data.vote) {
+        console.log("first if");
+        for (n = 0; n < gameRoom.players.length; n++) {
+          console.log("second for");
+          if (
+            submittedAnswer[i].socketval ===
+            gameRoom.players[n].connectionSocket
+          ) {
+            console.log("second if");
+            gameRoom.players[n].score++;
+            console.log(gameRoom.players[n]);
+          }
+        }
+      }
     }
+
+    io.emit("SHOW_VOTE", gameRoom.players);
     // submittedVote.push({ vote: data.vote });
 
     // if (submittedVote.length == gameRoom.players.length) {

@@ -9,6 +9,23 @@ class Header extends React.Component {
     return <h1> Cards Against Humanity </h1>;
   }
 }
+class Subheader extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      players: []
+    };
+  }
+
+  render() {
+    return (
+      <div className="card">
+        {/* to move this out of scoreboard eventually */}
+        <SubmitUser socket={this.props.socket} />
+      </div>
+    );
+  }
+}
 
 // Chat Box
 class ChatBox extends React.Component {
@@ -107,6 +124,9 @@ class ScoreBoard extends React.Component {
     this.props.socket.on("ROOM_PLAYERS", players => {
       this.setState({ players: players });
     });
+    this.props.socket.on("SHOW_VOTE", players => {
+      this.setState({ players: players });
+    });
   }
   render() {
     return (
@@ -123,8 +143,6 @@ class ScoreBoard extends React.Component {
                 );
               })}
             </div>
-            {/* to move this out of scoreboard eventually */}
-            <SubmitUser socket={this.props.socket} />
           </div>
         </div>
       </div>
@@ -172,33 +190,40 @@ class SubmitUser extends React.Component {
   render() {
     return (
       <div>
-        <input
-          type="text"
-          placeholder="Username"
-          name="username"
-          className="form-control"
-          value={this.state.username}
-          onChange={this.handleChange}
-        />
-
-        <button
-          onClick={this.sendUsername}
-          className="btn btn-primary form-control"
-        >
-          Submit Username
-        </button>
-        <button
-          onClick={this.joinGame}
-          className="btn btn-primary form-control"
-        >
-          Join Game
-        </button>
-        <button
-          onClick={this.startRound}
-          className="btn btn-primary form-control"
-        >
-          Start Round
-        </button>
+        <nav class="navbar navbar-light bg-light">
+          <form class="form-inline">
+            <input
+              type="text"
+              placeholder="Username"
+              name="username"
+              className="form-control"
+              value={this.state.username}
+              onChange={this.handleChange}
+            />
+            <button
+              onClick={this.sendUsername}
+              className="btn btn-primary form-control"
+            >
+              Submit Username
+            </button>
+          </form>
+          <form class="form-inline">
+            <button
+              onClick={this.joinGame}
+              className="btn btn-primary form-control"
+            >
+              Join Game
+            </button>
+          </form>
+          <form class="form-inline">
+            <button
+              onClick={this.startRound}
+              className="btn btn-primary form-control"
+            >
+              Start Round
+            </button>
+          </form>
+        </nav>
       </div>
     );
   }
@@ -233,11 +258,14 @@ class GameArea extends React.Component {
     });
   }
 
-  submitVote = answer => {
-    this.setState({ vote: answer.answer }, () => {
-      this.props.socket.emit("SUBMIT_VOTE", {
-        vote: this.state.vote
-      });
+  selectCard = answer => {
+    this.setState({ vote: answer });
+    console.log(this.state.vote);
+  };
+
+  submitVote = () => {
+    this.props.socket.emit("SUBMIT_VOTE", {
+      vote: this.state.vote
     });
   };
 
@@ -256,20 +284,25 @@ class GameArea extends React.Component {
           <hr />
           <div className="card">
             <div className="card-body">
-              <div className="card-title">
-                <h3>Answers: </h3>
-                <ul className="list-group list-group-flush">
-                  {this.state.answers.map(answer => {
-                    return (
-                      <li
-                        class="list-group-item"
-                        onClick={() => this.submitVote(answer)}
-                      >
-                        {answer}
-                      </li>
-                    );
-                  })}
-                </ul>
+              <h3>Answers: </h3>
+              <div className="card-title player-card">
+                {this.state.answers.map(answer => {
+                  return (
+                    <div
+                      className={`card-body btn btn-outline-dark pointer bold py-3 ${
+                        answer === this.state.vote ? "bg-primary" : ""
+                      }`}
+                    >
+                      <p onClick={() => this.selectCard(answer)}>{answer}</p>
+                    </div>
+                  );
+                })}
+                <button
+                  className="btn btn-primary form-control"
+                  onClick={() => this.submitVote()}
+                >
+                  Submit Vote
+                </button>
               </div>
             </div>
           </div>
@@ -307,55 +340,50 @@ class PlayerHand extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   };
 
-  submitCard = card => {
-    this.setState({ answer: card }, () => {
-      this.props.socket.emit("SUBMIT_ANSWER", {
-        answer: this.state.answer
-      });
+  selectCard = card => {
+    this.setState({ answer: card });
+  };
+
+  submitCard = () => {
+    this.props.socket.emit("SUBMIT_ANSWER", {
+      answer: this.state.answer
     });
   };
 
   render() {
     return (
       <div className="card">
-        {/* <div className="card-body">
-       <ul className="list-group list-group-flush">
-      {this.state.cards.map(card => {
-          return (
-            <div className="card player-card">
-              <div className="card-body">
-                {this.state.leader ? (
-                  <p className="card-text">{card}</p>
-                ) : (
-                  <p
-                    className="card-text"
-                    onClick={() => this.submitCard(card)}
+        <div className="card-body player-array">
+          <div className="card-title player-card">
+            {this.state.cards.map(card => {
+              return (
+                <div className="card card-card">
+                  <div
+                    className={`card-body btn btn-outline-dark pointer bold py-3 ${
+                      card === this.state.answer ? "bg-primary" : ""
+                    }`}
                   >
-                    {card}
-                  </p>
-                )}
-              </div>
-            </div>
-          );
-        })}
-        </ul>
-        </div> */}
-
-        <div className="card-body">
-          <div className="card-title">
-            <ul>
-              {this.state.cards.map(card => {
-                return (
-                  <li
-                    className="btn btn-outline-dark pointer bold py-3"
-                    onClick={() => this.submitCard(card)}
-                  >
-                    {card}
-                  </li>
-                );
-              })}
-            </ul>
+                    {this.state.leader ? (
+                      <p className="card-text">{card}</p>
+                    ) : (
+                      <p
+                        className="card-text"
+                        onClick={() => this.selectCard(card)}
+                      >
+                        {card}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
+          <button
+            className="btn btn-primary form-control"
+            onClick={() => this.submitCard()}
+          >
+            Submit Answer
+          </button>
         </div>
       </div>
     );
@@ -392,12 +420,13 @@ class App extends React.Component {
             </div>
           </div>
           <div class="row">
+            <div class="col-12">
+              <Subheader socket={socket} />
+            </div>
+          </div>
+          <div class="row">
             <div class="col-8">
-              <GameArea
-                // questions={questions}
-                // random={this.state.randomQuestion}
-                socket={socket}
-              />
+              <GameArea socket={socket} />
             </div>
 
             <div class="col-4">
@@ -409,11 +438,7 @@ class App extends React.Component {
 
           <div class="row">
             <div class="col-12">
-              <PlayerHand
-                // answers={answers}
-                // random={this.state.randomAnswer}
-                socket={socket}
-              />
+              <PlayerHand socket={socket} />
             </div>
           </div>
 
