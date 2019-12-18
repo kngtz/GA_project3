@@ -86,7 +86,20 @@ table {
   color: var(--pale-silver);
 }
 
+.player-array {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .player-card {
-  width: 20%;
-  height: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.card-card {
+  width: 250px;
+  height: 150px;
 }
