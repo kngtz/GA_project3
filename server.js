@@ -168,8 +168,10 @@ io.on("connection", function(socket) {
 
   socket.on("SUBMIT_ANSWER", function(data) {
     console.log(socket.id + ": SUBMIT ANSWER - " + data.answer);
+
     submittedAnswer.push({ socketval: socket.id, answer: data.answer });
     submittedString.push(data.answer);
+
     for (i = 0; i < gameRoom.players.length; i++) {
       if (socket.id === gameRoom.players[i].connectionSocket) {
         gameRoom.players[i].cards.splice(
@@ -190,15 +192,30 @@ io.on("connection", function(socket) {
       io.emit("SHOW_RESULT", submittedString);
     } else {
       console.log("still awaiting answers");
-      console.log(submittedAnswer);
     }
   });
   socket.on("SUBMIT_VOTE", function(data) {
     console.log(socket.id + ": SUBMIT VOTE - " + data.vote);
 
-    for (i = 0; i < gameRoom.players.length; i++) {
-      gameRoom.players[i].cards.findIndex(id => id === data.vote);
+    for (i = 0; i < submittedAnswer.length; i++) {
+      console.log("first for");
+      if (submittedAnswer[i].answer === data.answer) {
+        console.log("first if");
+        for (n = 0; n < gameRoom.players.length; n++) {
+          console.log("second for");
+          if (
+            submittedAnswer[i].socketval ===
+            gameRoom.players[n].connectionSocket
+          ) {
+            console.log("second if");
+            gameRoom.players[n].score++;
+            console.log(gameRoom.players[n]);
+          }
+        }
+      }
     }
+
+    io.emit("SHOW_VOTE", gameRoom.players);
     // submittedVote.push({ vote: data.vote });
 
     // if (submittedVote.length == gameRoom.players.length) {
