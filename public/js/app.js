@@ -124,9 +124,6 @@ class ScoreBoard extends React.Component {
     this.props.socket.on("ROOM_PLAYERS", players => {
       this.setState({ players: players });
     });
-    this.props.socket.on("SHOW_VOTE", players => {
-      this.setState({ players: players });
-    });
   }
   render() {
     return (
@@ -135,13 +132,17 @@ class ScoreBoard extends React.Component {
           <div className="card-title">
             <p>Score Board</p>
             <div className="scoreboard">
-              {this.state.players.map(player => {
-                return (
-                  <div>
-                    {player.name}: {player.score}
-                  </div>
-                );
-              })}
+              {this.state.players
+                .sort(function(a, b) {
+                  return b.score - a.score;
+                })
+                .map(player => {
+                  return (
+                    <div>
+                      {player.name}: {player.score}
+                    </div>
+                  );
+                })}
             </div>
           </div>
         </div>
