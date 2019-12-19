@@ -53,28 +53,50 @@ var shuffle = function(array) {
 
   return array;
 };
-shuffle(answers);
-shuffle(questions);
 
 //initialise variables
 let numUsers = 0;
 let userArray = [];
 let nameArray = [];
 
-let submittedAnswer = [];
-let submittedString = [];
-let submittedVote = [];
-let leaderCounter = 0;
-let flowCheck = 0;
-let anonymousCounter = 1;
-let room = "";
+// let submittedAnswer = [];
+// let submittedString = [];
+// let submittedVote = [];
+// let leaderCounter = 0;
+// let flowCheck = 0;
+// let anonymousCounter = 1;
+// let room = "";
 
-var gameRoom = {
-  Name: "Room 1",
-  players: [],
-  questions: questions,
-  answers: answers
-};
+// var roo[roomID] = {
+//   Name: "Room 1",
+//   players: [],
+//   questions: questions,
+//   answers: answers
+// };
+class GRoom {
+  constructor(name, answers, questions) {
+    this.name = name;
+    this.players = [];
+    this.questions = questions;
+    this.answers = answers;
+    this.submittedAnswer = [];
+    this.submittedString = [];
+    this.submittedVote = [];
+    this.leaderCounter = 0;
+    this.flowCheck = 0;
+    this.anonymousCounter = 1;
+    this.room = "";
+  }
+}
+var roo = [];
+for (i = 0; i < 10; i++) {
+  shuffle(answers);
+
+  shuffle(questions);
+  roo[i] = new GRoom("Room" + i, [...answers], [...questions]);
+}
+
+console.log(roo);
 
 // Routes
 app.get("/killgame", (req, res) => {
@@ -90,7 +112,7 @@ app.get("/killgame", (req, res) => {
   flowCheck = 0;
   anonymousCounter = 1;
 
-  gameRoom = {
+  roo[roomID] = {
     Name: "Room 1",
     players: [],
     questions: questions,
@@ -125,22 +147,15 @@ app.get("*", (req, res) => {
 });
 
 io.on("connection", function(socket) {
-  console.log("this is the socket username" + socket.username);
   numUsers++;
   userArray.push(socket.id);
 
-  console.log(socket.id + " connected");
-  console.log("Users online : " + numUsers);
-  console.log("the array is" + userArray);
-
   io.clients((error, clients) => {
     if (error) throw error;
-    console.log(clients);
   });
   // CHAT BOX FUNCTION ===============================================================================
   socket.on("SEND_MESSAGE", function(data) {
     let rooms = Object.keys(socket.rooms);
-    console.log(socket.id + ": SENT MESSAGE - " + data);
 
     io.to(rooms[1]).emit("RECEIVE_MESSAGE", data);
     // io.to(userArray[3]).emit("RECEIVE_MESSAGE", data); // private messaging proof of concept
@@ -151,9 +166,11 @@ io.on("connection", function(socket) {
   socket.on("SEND_USERNAME", function(data) {
     if (!socket.username) {
       if (nameArray.findIndex(id => id == data.username) < 0) {
+        console.log("entered send username");
         socket.username = data.username;
         nameArray.push(data.username);
-        socket.emit("USERNAME", data.username);
+        socket.emit("USERNAME", socket.username);
+        console.log(socket.username);
       } else {
         socket.emit("NOTIFICATION", "Username is taken");
       }
@@ -165,25 +182,27 @@ io.on("connection", function(socket) {
   });
   socket.on("JOIN_GAME", function(data) {
     room = "Room" + data.room;
-    console.log(room);
+    console.log(data.room);
+
     socket.join(room);
+    let roomID = roo.findIndex(p => p.name === room);
+    console.log(roomID);
     let rooms = Object.keys(socket.rooms);
-    console.log("hello" + rooms); // [ <socket.id>, 'room 237' ]
-    console.log("socket room " + socket.rooms);
-    console.log("this is the room number " + data.room);
-    var index = gameRoom.players.findIndex(
+
+    var index = roo[roomID].players.findIndex(
       p => p.connectionSocket == socket.id
     );
 
     if (!socket.username) {
-      socket.username = "anonymous" + anonymousCounter;
-      anonymousCounter++;
+      socket.username = "anonymous" + roo[roomID].anonymousCounter;
+      roo[roomID].anonymousCounter++;
       socket.emit("USERNAME", socket.username);
-      socket.emit("NOTIFICATION", "your username is " + socket.username);
+    } else {
+      socket.emit("USERNAME", socket.username);
     }
 
-    if (gameRoom.players.length === 0) {
-      gameRoom.players.push({
+    if (roo[roomID].players.length === 0) {
+      roo[roomID].players.push({
         connectionSocket: socket.id,
         name: socket.username,
         cards: [],
@@ -191,9 +210,9 @@ io.on("connection", function(socket) {
         leader: false
       });
 
-      io.to(room).emit("ROOM_PLAYERS", gameRoom.players);
+      io.to(room).emit("ROOM_PLAYERS", roo[roomID].players);
     } else if (index < 0) {
-      gameRoom.players.push({
+      roo[roomID].players.push({
         connectionSocket: socket.id,
         name: socket.username,
         cards: [],
@@ -201,58 +220,52 @@ io.on("connection", function(socket) {
         leader: false
       });
 
-      io.to(room).emit("ROOM_PLAYERS", gameRoom.players);
+      io.to(room).emit("ROOM_PLAYERS", roo[roomID].players);
     } else {
-      console.log("player is already in the game");
     }
 
     // if (socket.id !=== ){
   });
   socket.on("START_ROUND", function(data) {
-    console.log("this is the list of socket room " + socket.rooms);
-
     let rooms = Object.keys(socket.rooms);
-    console.log(rooms[1]);
+    let roomID = roo.findIndex(p => p.name === rooms[1]);
 
     socket.emit("NOTIFICATION", "");
-    if (flowCheck === 0) {
-      console.log("first" + flowCheck);
-      flowCheck++;
-      console.log("second" + flowCheck);
-      for (i = 0; i < gameRoom.players.length; i++) {
-        gameRoom.players[i].leader = false;
+    if (roo[roomID].flowCheck === 0) {
+      roo[roomID].flowCheck++;
+
+      for (i = 0; i < roo[roomID].players.length; i++) {
+        roo[roomID].players[i].leader = false;
       }
-      gameRoom.players[leaderCounter].leader = true;
-      io.to(rooms).emit("ROOM_PLAYERS", gameRoom.players);
-      if (leaderCounter === gameRoom.players.length - 1) {
-        leaderCounter = 0;
-        console.log("LEADERCOUNTER = " + leaderCounter);
+      roo[roomID].players[roo[roomID].leaderCounter].leader = true;
+      io.to(rooms).emit("ROOM_PLAYERS", roo[roomID].players);
+      if (roo[roomID].leaderCounter === roo[roomID].players.length - 1) {
+        roo[roomID].leaderCounter = 0;
       } else {
-        leaderCounter++;
-        console.log("leadercounter = " + leaderCounter);
+        roo[roomID].leaderCounter++;
       }
 
-      submittedAnswer = [];
-      submittedString = [];
+      roo[roomID].submittedAnswer = [];
+      roo[roomID].submittedString = [];
       io.to(rooms[1]).emit("CLEAR_RESULT", {
-        submittedAnswer: submittedAnswer,
-        players: gameRoom.players
+        submittedAnswer: roo[roomID].submittedAnswer,
+        players: roo[roomID].players
       });
 
-      io.to(rooms[1]).emit("QUESTION", gameRoom.questions[0].text);
-      gameRoom.questions.splice(0, 1);
+      io.to(rooms[1]).emit("QUESTION", roo[roomID].questions[0].text);
+      roo[roomID].questions.splice(0, 1);
 
-      for (i = 0; i < gameRoom.players.length; i++) {
-        for (n = gameRoom.players[i].cards.length; n < 7; n++) {
-          gameRoom.players[i].cards.push(gameRoom.answers[0]);
-          gameRoom.answers.splice(0, 1);
+      for (i = 0; i < roo[roomID].players.length; i++) {
+        for (n = roo[roomID].players[i].cards.length; n < 7; n++) {
+          roo[roomID].players[i].cards.push(roo[roomID].answers[0]);
+          roo[roomID].answers.splice(0, 1);
         }
-        io.to(gameRoom.players[i].connectionSocket).emit(
+        io.to(roo[roomID].players[i].connectionSocket).emit(
           "CARDS",
-          // gameRoom.players[i]
+
           {
-            cards: gameRoom.players[i].cards,
-            leader: gameRoom.players[i].leader
+            cards: roo[roomID].players[i].cards,
+            leader: roo[roomID].players[i].leader
           }
         );
       }
@@ -261,60 +274,53 @@ io.on("connection", function(socket) {
 
   socket.on("SUBMIT_ANSWER", function(data) {
     let rooms = Object.keys(socket.rooms);
-    console.log(socket.id + ": SUBMIT ANSWER - " + data.answer);
+    let roomID = roo.findIndex(p => p.name === rooms[1]);
+    roo[roomID].submittedAnswer.push({
+      socketval: socket.id,
+      answer: data.answer
+    });
+    roo[roomID].submittedString.push(data.answer);
 
-    submittedAnswer.push({ socketval: socket.id, answer: data.answer });
-    submittedString.push(data.answer);
-
-    for (i = 0; i < gameRoom.players.length; i++) {
-      if (socket.id === gameRoom.players[i].connectionSocket) {
-        gameRoom.players[i].cards.splice(
-          gameRoom.players[i].cards.findIndex(id => id === data.answer),
+    for (i = 0; i < roo[roomID].players.length; i++) {
+      if (socket.id === roo[roomID].players[i].connectionSocket) {
+        roo[roomID].players[i].cards.splice(
+          roo[roomID].players[i].cards.findIndex(id => id === data.answer),
           1
         );
       }
-      io.to(gameRoom.players[i].connectionSocket).emit("CARDS", {
-        cards: gameRoom.players[i].cards,
-        leader: gameRoom.players[i].leader
+      io.to(roo[roomID].players[i].connectionSocket).emit("CARDS", {
+        cards: roo[roomID].players[i].cards,
+        leader: roo[roomID].players[i].leader
       });
     }
 
-    if (submittedAnswer.length == gameRoom.players.length - 1) {
-      console.log("all players submitted");
-      console.log(submittedString);
-
-      io.to(rooms[1]).emit("SHOW_RESULT", submittedString);
+    if (roo[roomID].submittedAnswer.length == roo[roomID].players.length - 1) {
+      io.to(rooms[1]).emit("SHOW_RESULT", roo[roomID].submittedString);
     } else {
-      console.log("still awaiting answers");
     }
   });
   socket.on("SUBMIT_VOTE", function(data) {
     let rooms = Object.keys(socket.rooms);
-    console.log(socket.id + ": SUBMIT VOTE - " + data.vote);
-
-    for (i = 0; i < submittedAnswer.length; i++) {
-      console.log("first for");
-      if (submittedAnswer[i].answer === data.vote) {
-        console.log("first if");
-        for (n = 0; n < gameRoom.players.length; n++) {
-          console.log("second for");
+    let roomID = roo.findIndex(p => p.name === rooms[1]);
+    for (i = 0; i < roo[roomID].submittedAnswer.length; i++) {
+      if (roo[roomID].submittedAnswer[i].answer === data.vote) {
+        for (n = 0; n < roo[roomID].players.length; n++) {
           if (
-            submittedAnswer[i].socketval ===
-            gameRoom.players[n].connectionSocket
+            roo[roomID].submittedAnswer[i].socketval ===
+            roo[roomID].players[n].connectionSocket
           ) {
-            console.log("second if");
-            gameRoom.players[n].score++;
-            console.log(gameRoom.players[n]);
+            roo[roomID].players[n].score++;
           }
         }
       }
     }
 
-    io.to(rooms[1]).emit("ROOM_PLAYERS", gameRoom.players);
-    flowCheck = 0;
+    io.to(rooms[1]).emit("ROOM_PLAYERS", roo[roomID].players);
+    roo[roomID].flowCheck = 0;
   });
   socket.on("disconnect", function() {
     let rooms = Object.keys(socket.rooms);
+    let roomID = roo.findIndex(p => p.name === rooms[1]);
     numUsers--;
 
     userArray.splice(
@@ -323,14 +329,14 @@ io.on("connection", function(socket) {
     );
 
     if (
-      gameRoom.players.findIndex(id => id.connectionSocket == socket.id) >= 0
+      roo[roomID].players.findIndex(id => id.connectionSocket == socket.id) >= 0
     ) {
-      gameRoom.players.splice(
-        gameRoom.players.findIndex(id => id.connectionSocket == socket.id),
+      roo[roomID].players.splice(
+        roo[roomID].players.findIndex(id => id.connectionSocket == socket.id),
         1
       );
     }
-    io.to(rooms[1]).emit("ROOM_PLAYERS", gameRoom.players);
+    io.to(rooms[1]).emit("ROOM_PLAYERS", roo[roomID].players);
   });
 });
 

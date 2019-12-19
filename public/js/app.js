@@ -62,6 +62,7 @@ class ChatBox extends React.Component {
       this.addMessage(data);
     });
     this.props.socket.on("USERNAME", username => {
+      console.log("hello");
       this.setState({ username: username });
     });
   }
