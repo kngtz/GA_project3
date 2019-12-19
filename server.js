@@ -76,6 +76,8 @@ var gameRoom = {
 
 // Routes
 app.get("/killgame", (req, res) => {
+  shuffle(answers);
+  shuffle(questions);
   numUsers = 0;
   userArray = [];
   nameArray = [];
@@ -92,6 +94,7 @@ app.get("/killgame", (req, res) => {
     questions: questions,
     answers: answers
   };
+  res.redirect("/");
 });
 
 app.get("/seedq", (req, res) => {
