@@ -13,14 +13,32 @@ class Subheader extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      players: []
+      username: ""
     };
   }
 
+  startRound = ev => {
+    ev.preventDefault();
+    this.props.socket.emit("START_ROUND", {});
+  };
+
+  handleChange = event => {
+    this.setState({ [event.target.name]: event.target.value });
+  };
+
   render() {
     return (
-      <div className="card">
-        <SubmitUser socket={this.props.socket} />
+      <div>
+        <nav class="navbar navbar-light bg-light">
+          <form class="form-inline">
+            <button
+              onClick={this.startRound}
+              className="btn btn-primary form-control"
+            >
+              Start Round
+            </button>
+          </form>
+        </nav>
       </div>
     );
   }
@@ -44,6 +62,7 @@ class ChatBox extends React.Component {
       this.addMessage(data);
     });
     this.props.socket.on("USERNAME", username => {
+      console.log("hello");
       this.setState({ username: username });
     });
   }
@@ -136,7 +155,6 @@ class ScoreBoard extends React.Component {
                   return b.score - a.score;
                 })
                 .map(player => {
-                  console.log(player);
                   if (player.leader === true) {
                     return (
                       <div className="bg-success">
@@ -186,14 +204,10 @@ class SubmitUser extends React.Component {
     });
   };
 
-  joinGame = ev => {
-    ev.preventDefault();
-    this.props.socket.emit("JOIN_GAME", {});
-  };
-
-  startRound = ev => {
-    ev.preventDefault();
-    this.props.socket.emit("START_ROUND", {});
+  joinGame = room => {
+    this.props.socket.emit("JOIN_GAME", {
+      room: room
+    });
   };
 
   handleChange = event => {
@@ -222,20 +236,22 @@ class SubmitUser extends React.Component {
           </form>
           <p>{this.state.notification}</p>
           <form class="form-inline">
-            <button
-              onClick={this.joinGame}
+            <Link
+              to="/room"
+              onClick={() => this.joinGame(1)}
               className="btn btn-primary form-control"
             >
-              Join Game
-            </button>
+              Join Room 1
+            </Link>
           </form>
           <form class="form-inline">
-            <button
-              onClick={this.startRound}
+            <Link
+              to="/room"
+              onClick={() => this.joinGame(2)}
               className="btn btn-primary form-control"
             >
-              Start Round
-            </button>
+              Join Room 2
+            </Link>
           </form>
         </nav>
       </div>
@@ -427,56 +443,47 @@ class App extends React.Component {
   render() {
     return (
       <BrowserRouter>
-        <div class="container">
-          <div class="row">
-            <div class="col-12">
-              <Header />
+        <Switch>
+          <Route exact path="/">
+            <h1>CARDS AGAINST HUMANITY</h1>
+            <div class="row">
+              <div class="col-12">
+                <SubmitUser socket={socket} />
+              </div>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-12">
-              <Subheader socket={socket} />
+          </Route>
+          <Route path="/room">
+            <div class="container">
+              <div class="row">
+                <div class="col-12">
+                  <Header />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <Subheader socket={socket} />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-8">
+                  <GameArea socket={socket} />
+                </div>
+
+                <div class="col-4">
+                  <ChatBox socket={socket} />
+                </div>
+              </div>
+
+              <hr />
+
+              <div class="row">
+                <div class="col-12">
+                  <PlayerHand socket={socket} />
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-8">
-              <GameArea socket={socket} />
-            </div>
-
-            <div class="col-4">
-              <ChatBox socket={socket} />
-            </div>
-          </div>
-
-          <hr />
-
-          <div class="row">
-            <div class="col-12">
-              <PlayerHand socket={socket} />
-            </div>
-          </div>
-
-          <hr />
-
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/second">Second</Link>
-            </li>
-          </ul>
-          <hr />
-
-          <Switch>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route path="/second">
-              <Second />
-            </Route>
-          </Switch>
-        </div>
+          </Route>
+        </Switch>
       </BrowserRouter>
     );
   }
