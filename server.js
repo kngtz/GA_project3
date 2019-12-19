@@ -127,13 +127,14 @@ io.on("connection", function(socket) {
   socket.on("SEND_USERNAME", function(data) {
     if (!socket.username) {
       if (nameArray.findIndex(id => id == data.username) < 0) {
-        console.log("Set user name");
         socket.username = data.username;
         nameArray.push(data.username);
         socket.emit("USERNAME", data.username);
-      } else console.log("Username is taken");
+      } else {
+        socket.emit("NOTIFICATION", "Username is taken");
+      }
     } else {
-      console.log("Username is defined");
+      socket.emit("NOTIFICATION", "You already have a username");
     }
 
     //socket.emit("USERNAME", data.username);
@@ -142,14 +143,14 @@ io.on("connection", function(socket) {
     var index = gameRoom.players.findIndex(
       p => p.connectionSocket == socket.id
     );
-    console.log(socket.username);
+
     if (!socket.username) {
-      console.log("HELLO");
       socket.username = "anonymous" + anonymousCounter;
       anonymousCounter++;
       socket.emit("USERNAME", socket.username);
+      socket.emit("NOTIFICATION", "your username is " + socket.username);
     }
-    console.log(index);
+
     if (gameRoom.players.length === 0) {
       gameRoom.players.push({
         connectionSocket: socket.id,
@@ -158,7 +159,7 @@ io.on("connection", function(socket) {
         score: 0,
         leader: false
       });
-      console.log("JOIN GAME");
+
       io.emit("ROOM_PLAYERS", gameRoom.players);
     } else if (index < 0) {
       gameRoom.players.push({
@@ -168,7 +169,7 @@ io.on("connection", function(socket) {
         score: 0,
         leader: false
       });
-      console.log("JOIN GAME");
+
       io.emit("ROOM_PLAYERS", gameRoom.players);
     } else {
       console.log("player is already in the game");
@@ -177,6 +178,7 @@ io.on("connection", function(socket) {
     // if (socket.id !=== ){
   });
   socket.on("START_ROUND", function(data) {
+    socket.emit("NOTIFICATION", "");
     if (flowCheck === 0) {
       console.log("first" + flowCheck);
       flowCheck++;
@@ -185,7 +187,7 @@ io.on("connection", function(socket) {
         gameRoom.players[i].leader = false;
       }
       gameRoom.players[leaderCounter].leader = true;
-
+      io.emit("ROOM_PLAYERS", gameRoom.players);
       if (leaderCounter === gameRoom.players.length - 1) {
         leaderCounter = 0;
         console.log("LEADERCOUNTER = " + leaderCounter);

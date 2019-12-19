@@ -20,7 +20,6 @@ class Subheader extends React.Component {
   render() {
     return (
       <div className="card">
-        {/* to move this out of scoreboard eventually */}
         <SubmitUser socket={this.props.socket} />
       </div>
     );
@@ -137,11 +136,20 @@ class ScoreBoard extends React.Component {
                   return b.score - a.score;
                 })
                 .map(player => {
-                  return (
-                    <div>
-                      {player.name}: {player.score}
-                    </div>
-                  );
+                  console.log(player);
+                  if (player.leader === true) {
+                    return (
+                      <div className="bg-success">
+                        {player.name}: {player.score}
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div>
+                        {player.name}: {player.score}
+                      </div>
+                    );
+                  }
                 })}
             </div>
           </div>
@@ -156,7 +164,8 @@ class SubmitUser extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: ""
+      username: "",
+      notification: ""
     };
   }
 
@@ -164,6 +173,9 @@ class SubmitUser extends React.Component {
     // this.props.socket = io("localhost:3000");
     this.props.socket.on("USERNAME", username => {
       this.setState({ username: username });
+    });
+    this.props.socket.on("NOTIFICATION", notification => {
+      this.setState({ notification: notification });
     });
   }
 
@@ -208,6 +220,7 @@ class SubmitUser extends React.Component {
               Submit Username
             </button>
           </form>
+          <p>{this.state.notification}</p>
           <form class="form-inline">
             <button
               onClick={this.joinGame}
