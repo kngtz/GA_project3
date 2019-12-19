@@ -427,56 +427,43 @@ class App extends React.Component {
   render() {
     return (
       <BrowserRouter>
-        <div class="container">
-          <div class="row">
-            <div class="col-12">
-              <Header />
+        <Switch>
+          <Route exact path="/">
+            <h1>LANDING PAGE</h1>
+            <Link to="/room">Enter room</Link>
+          </Route>
+          <Route path="/room">
+            <div class="container">
+              <div class="row">
+                <div class="col-12">
+                  <Header />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <Subheader socket={socket} />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-8">
+                  <GameArea socket={socket} />
+                </div>
+
+                <div class="col-4">
+                  <ChatBox socket={socket} />
+                </div>
+              </div>
+
+              <hr />
+
+              <div class="row">
+                <div class="col-12">
+                  <PlayerHand socket={socket} />
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-12">
-              <Subheader socket={socket} />
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-8">
-              <GameArea socket={socket} />
-            </div>
-
-            <div class="col-4">
-              <ChatBox socket={socket} />
-            </div>
-          </div>
-
-          <hr />
-
-          <div class="row">
-            <div class="col-12">
-              <PlayerHand socket={socket} />
-            </div>
-          </div>
-
-          <hr />
-
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/second">Second</Link>
-            </li>
-          </ul>
-          <hr />
-
-          <Switch>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route path="/second">
-              <Second />
-            </Route>
-          </Switch>
-        </div>
+          </Route>
+        </Switch>
       </BrowserRouter>
     );
   }
