@@ -65,6 +65,7 @@ let submittedString = [];
 let submittedVote = [];
 let leaderCounter = 0;
 let flowCheck = 0;
+let anonymousCounter = 1;
 
 var gameRoom = {
   Name: "Room 1",
@@ -126,13 +127,14 @@ io.on("connection", function(socket) {
   socket.on("SEND_USERNAME", function(data) {
     if (!socket.username) {
       if (nameArray.findIndex(id => id == data.username) < 0) {
-        console.log("Set user name");
         socket.username = data.username;
         nameArray.push(data.username);
         socket.emit("USERNAME", data.username);
-      } else console.log("Username is taken");
+      } else {
+        socket.emit("NOTIFICATION", "Username is taken");
+      }
     } else {
-      console.log("Username is defined");
+      socket.emit("NOTIFICATION", "You already have a username");
     }
 
     //socket.emit("USERNAME", data.username);
@@ -141,9 +143,15 @@ io.on("connection", function(socket) {
     var index = gameRoom.players.findIndex(
       p => p.connectionSocket == socket.id
     );
-    console.log(index);
+
+    if (!socket.username) {
+      socket.username = "anonymous" + anonymousCounter;
+      anonymousCounter++;
+      socket.emit("USERNAME", socket.username);
+      socket.emit("NOTIFICATION", "your username is " + socket.username);
+    }
+
     if (gameRoom.players.length === 0) {
-      console.log("First if in join game");
       gameRoom.players.push({
         connectionSocket: socket.id,
         name: socket.username,
@@ -151,10 +159,9 @@ io.on("connection", function(socket) {
         score: 0,
         leader: false
       });
-      console.log("JOIN GAME");
+
       io.emit("ROOM_PLAYERS", gameRoom.players);
     } else if (index < 0) {
-      console.log("Second if in join game");
       gameRoom.players.push({
         connectionSocket: socket.id,
         name: socket.username,
@@ -162,7 +169,7 @@ io.on("connection", function(socket) {
         score: 0,
         leader: false
       });
-      console.log("JOIN GAME");
+
       io.emit("ROOM_PLAYERS", gameRoom.players);
     } else {
       console.log("player is already in the game");
@@ -171,12 +178,24 @@ io.on("connection", function(socket) {
     // if (socket.id !=== ){
   });
   socket.on("START_ROUND", function(data) {
+    socket.emit("NOTIFICATION", "");
     if (flowCheck === 0) {
+      console.log("first" + flowCheck);
+      flowCheck++;
+      console.log("second" + flowCheck);
       for (i = 0; i < gameRoom.players.length; i++) {
         gameRoom.players[i].leader = false;
       }
       gameRoom.players[leaderCounter].leader = true;
-      leaderCounter++;
+      io.emit("ROOM_PLAYERS", gameRoom.players);
+      if (leaderCounter === gameRoom.players.length - 1) {
+        leaderCounter = 0;
+        console.log("LEADERCOUNTER = " + leaderCounter);
+      } else {
+        leaderCounter++;
+        console.log("leadercounter = " + leaderCounter);
+      }
+
       submittedAnswer = [];
       submittedString = [];
       io.emit("CLEAR_RESULT", {
@@ -253,7 +272,9 @@ io.on("connection", function(socket) {
       }
     }
 
-    io.emit("SHOW_VOTE", gameRoom.players);
+    io.emit("ROOM_PLAYERS", gameRoom.players);
+    flowCheck = 0;
+    console.log("second" + flowCheck);
   });
   socket.on("disconnect", function() {
     numUsers--;
@@ -267,5 +288,5 @@ io.on("connection", function(socket) {
 });
 
 http.listen(PORT, function() {
-  console.log("listening on *:3000");
+  console.log("listening on");
 });
