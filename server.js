@@ -60,12 +60,14 @@ shuffle(questions);
 let numUsers = 0;
 let userArray = [];
 let nameArray = [];
+
 let submittedAnswer = [];
 let submittedString = [];
 let submittedVote = [];
 let leaderCounter = 0;
 let flowCheck = 0;
 let anonymousCounter = 1;
+let room = "";
 
 var gameRoom = {
   Name: "Room 1",
@@ -137,9 +139,10 @@ io.on("connection", function(socket) {
   });
   // CHAT BOX FUNCTION ===============================================================================
   socket.on("SEND_MESSAGE", function(data) {
+    let rooms = Object.keys(socket.rooms);
     console.log(socket.id + ": SENT MESSAGE - " + data);
 
-    io.emit("RECEIVE_MESSAGE", data);
+    io.to(rooms[1]).emit("RECEIVE_MESSAGE", data);
     // io.to(userArray[3]).emit("RECEIVE_MESSAGE", data); // private messaging proof of concept
   });
 
@@ -161,6 +164,13 @@ io.on("connection", function(socket) {
     //socket.emit("USERNAME", data.username);
   });
   socket.on("JOIN_GAME", function(data) {
+    room = "Room" + data.room;
+    console.log(room);
+    socket.join(room);
+    let rooms = Object.keys(socket.rooms);
+    console.log("hello" + rooms); // [ <socket.id>, 'room 237' ]
+    console.log("socket room " + socket.rooms);
+    console.log("this is the room number " + data.room);
     var index = gameRoom.players.findIndex(
       p => p.connectionSocket == socket.id
     );
@@ -181,7 +191,7 @@ io.on("connection", function(socket) {
         leader: false
       });
 
-      io.emit("ROOM_PLAYERS", gameRoom.players);
+      io.to(room).emit("ROOM_PLAYERS", gameRoom.players);
     } else if (index < 0) {
       gameRoom.players.push({
         connectionSocket: socket.id,
@@ -191,7 +201,7 @@ io.on("connection", function(socket) {
         leader: false
       });
 
-      io.emit("ROOM_PLAYERS", gameRoom.players);
+      io.to(room).emit("ROOM_PLAYERS", gameRoom.players);
     } else {
       console.log("player is already in the game");
     }
@@ -199,6 +209,11 @@ io.on("connection", function(socket) {
     // if (socket.id !=== ){
   });
   socket.on("START_ROUND", function(data) {
+    console.log("this is the list of socket room " + socket.rooms);
+
+    let rooms = Object.keys(socket.rooms);
+    console.log(rooms[1]);
+
     socket.emit("NOTIFICATION", "");
     if (flowCheck === 0) {
       console.log("first" + flowCheck);
@@ -208,7 +223,7 @@ io.on("connection", function(socket) {
         gameRoom.players[i].leader = false;
       }
       gameRoom.players[leaderCounter].leader = true;
-      io.emit("ROOM_PLAYERS", gameRoom.players);
+      io.to(rooms).emit("ROOM_PLAYERS", gameRoom.players);
       if (leaderCounter === gameRoom.players.length - 1) {
         leaderCounter = 0;
         console.log("LEADERCOUNTER = " + leaderCounter);
@@ -219,12 +234,12 @@ io.on("connection", function(socket) {
 
       submittedAnswer = [];
       submittedString = [];
-      io.emit("CLEAR_RESULT", {
+      io.to(rooms[1]).emit("CLEAR_RESULT", {
         submittedAnswer: submittedAnswer,
         players: gameRoom.players
       });
 
-      io.emit("QUESTION", gameRoom.questions[0].text);
+      io.to(rooms[1]).emit("QUESTION", gameRoom.questions[0].text);
       gameRoom.questions.splice(0, 1);
 
       for (i = 0; i < gameRoom.players.length; i++) {
@@ -245,6 +260,7 @@ io.on("connection", function(socket) {
   });
 
   socket.on("SUBMIT_ANSWER", function(data) {
+    let rooms = Object.keys(socket.rooms);
     console.log(socket.id + ": SUBMIT ANSWER - " + data.answer);
 
     submittedAnswer.push({ socketval: socket.id, answer: data.answer });
@@ -267,12 +283,13 @@ io.on("connection", function(socket) {
       console.log("all players submitted");
       console.log(submittedString);
 
-      io.emit("SHOW_RESULT", submittedString);
+      io.to(rooms[1]).emit("SHOW_RESULT", submittedString);
     } else {
       console.log("still awaiting answers");
     }
   });
   socket.on("SUBMIT_VOTE", function(data) {
+    let rooms = Object.keys(socket.rooms);
     console.log(socket.id + ": SUBMIT VOTE - " + data.vote);
 
     for (i = 0; i < submittedAnswer.length; i++) {
@@ -293,18 +310,27 @@ io.on("connection", function(socket) {
       }
     }
 
-    io.emit("ROOM_PLAYERS", gameRoom.players);
+    io.to(rooms[1]).emit("ROOM_PLAYERS", gameRoom.players);
     flowCheck = 0;
-    console.log("second" + flowCheck);
   });
   socket.on("disconnect", function() {
+    let rooms = Object.keys(socket.rooms);
     numUsers--;
-    console.log(socket.id + " disconnected");
+
     userArray.splice(
       userArray.findIndex(id => id === socket.id),
       1
     );
-    console.log("Users online : " + numUsers);
+
+    if (
+      gameRoom.players.findIndex(id => id.connectionSocket == socket.id) >= 0
+    ) {
+      gameRoom.players.splice(
+        gameRoom.players.findIndex(id => id.connectionSocket == socket.id),
+        1
+      );
+    }
+    io.to(rooms[1]).emit("ROOM_PLAYERS", gameRoom.players);
   });
 });
 
