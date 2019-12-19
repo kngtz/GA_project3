@@ -56,7 +56,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-# .env  **uncomment this for heroku deployment**
+.env  **uncomment this for heroku deployment**
 
 # next.js build output
 .next

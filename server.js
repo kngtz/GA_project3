@@ -75,6 +75,27 @@ var gameRoom = {
 };
 
 // Routes
+app.get("/killgame", (req, res) => {
+  shuffle(answers);
+  shuffle(questions);
+  numUsers = 0;
+  userArray = [];
+  nameArray = [];
+  submittedAnswer = [];
+  submittedString = [];
+  submittedVote = [];
+  leaderCounter = 0;
+  flowCheck = 0;
+  anonymousCounter = 1;
+
+  gameRoom = {
+    Name: "Room 1",
+    players: [],
+    questions: questions,
+    answers: answers
+  };
+  res.redirect("/");
+});
 
 app.get("/seedq", (req, res) => {
   question.create(
