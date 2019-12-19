@@ -59,6 +59,7 @@ shuffle(questions);
 //initialise variables
 let numUsers = 0;
 let userArray = [];
+let nameArray = [];
 let submittedAnswer = [];
 let submittedString = [];
 let submittedVote = [];
@@ -124,11 +125,14 @@ io.on("connection", function(socket) {
 
   socket.on("SEND_USERNAME", function(data) {
     if (!socket.username) {
-      console.log("Set user name");
-      socket.username = data.username;
-      socket.emit("USERNAME", data.username);
+      if (nameArray.findIndex(id => id == data.username) < 0) {
+        console.log("Set user name");
+        socket.username = data.username;
+        nameArray.push(data.username);
+        socket.emit("USERNAME", data.username);
+      } else console.log("Username is taken");
     } else {
-      console.log("user is defined");
+      console.log("Username is defined");
     }
 
     //socket.emit("USERNAME", data.username);
@@ -250,17 +254,6 @@ io.on("connection", function(socket) {
     }
 
     io.emit("SHOW_VOTE", gameRoom.players);
-    // submittedVote.push({ vote: data.vote });
-
-    // if (submittedVote.length == gameRoom.players.length) {
-    //   console.log("all players submitted");
-    //   console.log(submittedVote);
-
-    //   io.emit("SHOW_VOTES", submittedVote);
-    // } else {
-    //   console.log("still awaiting votes");
-    //   console.log(submittedVote);
-    // }
   });
   socket.on("disconnect", function() {
     numUsers--;
