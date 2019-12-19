@@ -270,7 +270,7 @@ io.on("connection", function(socket) {
       }
     }
 
-    io.emit("SHOW_VOTE", gameRoom.players);
+    io.emit("ROOM_PLAYERS", gameRoom.players);
     flowCheck = 0;
     console.log("second" + flowCheck);
   });
