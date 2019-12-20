@@ -29,6 +29,12 @@ h1 {
   padding: 1em;
 }
 
+.card {
+  background: black;
+  color: white;
+  text-align: center;
+}
+
 input[type="submit"] {
   padding: 0.5em;
   background: var(--languid-lavender);
