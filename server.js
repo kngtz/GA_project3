@@ -13,7 +13,7 @@ var io = require("socket.io")(http);
 
 // Environment Variables
 const mongoURI = process.env.MONGODB_URI;
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8083;
 
 // Connect to Mongo
 mongoose.connect(mongoURI, { useNewUrlParser: true }, () =>
