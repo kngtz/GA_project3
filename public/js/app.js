@@ -31,6 +31,7 @@ class Header extends React.Component {
     return <h1> {this.state.question} </h1>;
   }
 }
+
 class Subheader extends React.Component {
   constructor(props) {
     super(props);
@@ -50,17 +51,17 @@ class Subheader extends React.Component {
 
   render() {
     return (
-      <div>
-        <nav class="navbar navbar-light bg-light">
-          <form class="form-inline">
+      <div className="card">
+        <div className="card-body player-array">
+          <div className="card-title player-card">
             <button
               onClick={this.startRound}
-              className="btn btn-primary form-control"
+              className="btn btn-dark form-control"
             >
               Start Round
             </button>
-          </form>
-        </nav>
+          </div>
+        </div>
       </div>
     );
   }
@@ -109,7 +110,9 @@ class ChatBox extends React.Component {
     return (
       <div className="card">
         <div className="card-body">
-          <div className="card-title">Chat</div>
+          <div className="card-title">
+            <h3>Chat</h3>
+          </div>
 
           <hr />
           <div className="messages">
@@ -134,7 +137,7 @@ class ChatBox extends React.Component {
           <br />
           <button
             onClick={this.sendMessage}
-            className="btn btn-primary form-control"
+            className="btn btn-dark form-control"
           >
             Send
           </button>
@@ -171,7 +174,7 @@ class ScoreBoard extends React.Component {
       <div className="card">
         <div className="card-body">
           <div className="card-title">
-            <p>Score Board</p>
+            <h3>Score Board</h3>
             <div className="scoreboard">
               {this.state.players
                 .sort(function(a, b) {
@@ -180,7 +183,7 @@ class ScoreBoard extends React.Component {
                 .map(player => {
                   if (player.leader === true) {
                     return (
-                      <div className="bg-success">
+                      <div className="bg-white text-dark">
                         {player.name}: {player.score}
                       </div>
                     );
@@ -252,7 +255,7 @@ class SubmitUser extends React.Component {
             />
             <button
               onClick={this.sendUsername}
-              className="btn btn-primary form-control"
+              className="btn btn-dark form-control"
             >
               Submit Username
             </button>
@@ -262,7 +265,7 @@ class SubmitUser extends React.Component {
             <Link
               to="/room"
               onClick={() => this.joinGame(1)}
-              className="btn btn-primary form-control"
+              className="btn btn-dark form-control"
             >
               Join Room 1
             </Link>
@@ -271,7 +274,7 @@ class SubmitUser extends React.Component {
             <Link
               to="/room"
               onClick={() => this.joinGame(2)}
-              className="btn btn-primary form-control"
+              className="btn btn-dark form-control"
             >
               Join Room 2
             </Link>
@@ -280,7 +283,7 @@ class SubmitUser extends React.Component {
             <Link
               to="/room"
               onClick={() => this.joinGame(3)}
-              className="btn btn-primary form-control"
+              className="btn btn-dark form-control"
             >
               Join Room 3
             </Link>
@@ -289,7 +292,7 @@ class SubmitUser extends React.Component {
             <Link
               to="/room"
               onClick={() => this.joinGame(4)}
-              className="btn btn-primary form-control"
+              className="btn btn-dark form-control"
             >
               Join Room 4
             </Link>
@@ -298,7 +301,7 @@ class SubmitUser extends React.Component {
             <Link
               to="/room"
               onClick={() => this.joinGame(5)}
-              className="btn btn-primary form-control"
+              className="btn btn-dark form-control"
             >
               Join Room 5
             </Link>
@@ -307,7 +310,7 @@ class SubmitUser extends React.Component {
             <Link
               to="/room"
               onClick={() => this.joinGame(6)}
-              className="btn btn-primary form-control"
+              className="btn btn-dark form-control"
             >
               Join Room 6
             </Link>
@@ -316,7 +319,7 @@ class SubmitUser extends React.Component {
             <Link
               to="/room"
               onClick={() => this.joinGame(7)}
-              className="btn btn-primary form-control"
+              className="btn btn-dark form-control"
             >
               Join Room 7
             </Link>
@@ -327,7 +330,7 @@ class SubmitUser extends React.Component {
   }
 }
 
-// Game Area
+// Answer
 class GameArea extends React.Component {
   constructor(props) {
     super(props);
@@ -364,37 +367,28 @@ class GameArea extends React.Component {
 
   render() {
     return (
-      <div class="row">
-        <div class="col-8">
-          <hr />
-          <div className="card">
-            <div className="card-body">
-              <h3>Answers: </h3>
-              <div className="card-title player-card">
-                {this.state.answers.map(answer => {
-                  return (
-                    <div
-                      className={`card-body btn btn-outline-dark pointer bold py-3 ${
-                        answer === this.state.vote ? "bg-primary" : ""
-                      }`}
-                    >
-                      <p onClick={() => this.selectCard(answer)}>{answer}</p>
-                    </div>
-                  );
-                })}
-                <button
-                  className="btn btn-primary form-control"
-                  onClick={() => this.submitVote()}
+      <div className="card">
+        <div className="card-body">
+          <h3>Answers: </h3>
+          <div className="card-title player-array">
+            {this.state.answers.map(answer => {
+              return (
+                <div
+                  className={`player-card card-body btn btn-outline-light pointer bold py-3 ${
+                    answer === this.state.vote ? "bg-white text-dark" : ""
+                  }`}
+                  onClick={() => this.selectCard(answer)}
                 >
-                  Submit Vote
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-4">
-          <div>
-            <ScoreBoard socket={this.props.socket} />
+                  <p>{answer}</p>
+                </div>
+              );
+            })}
+            <button
+              className="btn btn-dark form-control"
+              onClick={() => this.submitVote()}
+            >
+              Submit Vote
+            </button>
           </div>
         </div>
       </div>
@@ -443,9 +437,26 @@ class PlayerHand extends React.Component {
             {this.state.cards.map(card => {
               return (
                 <div className="card card-card">
-                  <div
-                    className={`card-body btn btn-outline-dark pointer bold py-3 ${
-                      card === this.state.answer ? "bg-primary" : ""
+                  {this.state.leader ? (
+                    <div
+                      className={`card-body btn btn-outline-light pointer bold py-3`}
+                    >
+                      <p className="card-text">{card}</p>
+                    </div>
+                  ) : (
+                    <div
+                      className={`card-body btn btn-outline-light pointer bold py-3 ${
+                        card === this.state.answer ? "bg-white text-dark" : ""
+                      }`}
+                      onClick={() => this.selectCard(card)}
+                    >
+                      <p className="card-text">{card}</p>
+                    </div>
+                  )}
+
+                  {/* <div
+                    className={`card-body btn btn-outline-light pointer bold py-3 ${
+                      card === this.state.answer ? "bg-white text-dark" : ""
                     }`}
                   >
                     {this.state.leader ? (
@@ -458,13 +469,13 @@ class PlayerHand extends React.Component {
                         {card}
                       </p>
                     )}
-                  </div>
+                  </div> */}
                 </div>
               );
             })}
           </div>
           <button
-            className="btn btn-primary form-control"
+            className="btn btn-dark form-control"
             onClick={() => this.submitCard()}
           >
             Submit Answer
@@ -515,12 +526,10 @@ class App extends React.Component {
                 </div>
               </div>
               <div class="row">
-                <div class="col-12">
-                  <Subheader socket={socket} />
+                <div class="col-4">
+                  <ScoreBoard socket={socket} />
                 </div>
-              </div>
-              <div class="row">
-                <div class="col-8">
+                <div class="col-4">
                   <GameArea socket={socket} />
                 </div>
 
@@ -528,9 +537,13 @@ class App extends React.Component {
                   <ChatBox socket={socket} />
                 </div>
               </div>
-
               <hr />
-
+              <div class="row">
+                <div class="col-12">
+                  <Subheader socket={socket} />
+                </div>
+              </div>
+              <hr />
               <div class="row">
                 <div class="col-12">
                   <PlayerHand socket={socket} />
