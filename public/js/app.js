@@ -5,8 +5,37 @@ const { BrowserRouter, Link, Switch, Route, browserHistory } = ReactRouterDOM;
 let socket = io();
 
 class Header extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "",
+      question: "Question?",
+      vote: "",
+      answers: []
+    };
+  }
+  componentDidMount() {
+    console.log("hellooo", this.props.socket)
+    // this.props.socket = io("localhost:3000");
+
+    this.props.socket.on("QUESTION", question => {
+      this.setState({ question: question });
+    });
+    this.props.socket.on("CLEAR_RESULT", data => {
+      console.log("ENTERED");
+      console.log(data.submittedAnswer);
+      this.setState({ answers: data.submittedAnswer });
+    });
+    this.props.socket.on("SHOW_RESULT", data => {
+      console.log("ENTEererRED");
+      console.log(data);
+      this.setState({ answers: data });
+    });
+  }
   render() {
-    return <h1> Cards Against Humanity </h1>;
+   
+    console.log("hellooo", this.state.question)
+    return <h1> {this.state.question} </h1>;
   }
 }
 class Subheader extends React.Component {
@@ -456,7 +485,7 @@ class App extends React.Component {
             <div class="container">
               <div class="row">
                 <div class="col-12">
-                  <Header />
+                  <Header socket={socket}/>
                 </div>
               </div>
               <div class="row">
