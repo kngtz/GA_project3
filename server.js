@@ -13,7 +13,7 @@ var io = require("socket.io")(http);
 
 // Environment Variables
 const mongoURI = process.env.MONGODB_URI;
-const PORT = process.env.PORT || 8083;
+const PORT = process.env.PORT || 3000;
 
 // Connect to Mongo
 mongoose.connect(mongoURI, { useNewUrlParser: true }, () =>
@@ -64,7 +64,7 @@ let nameArray = [];
 // let submittedVote = [];
 // let leaderCounter = 0;
 // let flowCheck = 0;
-// let anonymousCounter = 1;
+let anonymousCounter = 1;
 // let room = "";
 
 // var roo[roomID] = {
@@ -84,7 +84,7 @@ class GRoom {
     this.submittedVote = [];
     this.leaderCounter = 0;
     this.flowCheck = 0;
-    this.anonymousCounter = 1;
+
     this.room = "";
   }
 }
@@ -166,11 +166,9 @@ io.on("connection", function(socket) {
   socket.on("SEND_USERNAME", function(data) {
     if (!socket.username) {
       if (nameArray.findIndex(id => id == data.username) < 0) {
-        console.log("entered send username");
         socket.username = data.username;
         nameArray.push(data.username);
         socket.emit("USERNAME", socket.username);
-        console.log(socket.username);
       } else {
         socket.emit("NOTIFICATION", "Username is taken");
       }
@@ -182,11 +180,10 @@ io.on("connection", function(socket) {
   });
   socket.on("JOIN_GAME", function(data) {
     room = "Room" + data.room;
-    console.log(data.room);
 
     socket.join(room);
     let roomID = roo.findIndex(p => p.name === room);
-    console.log(roomID);
+
     let rooms = Object.keys(socket.rooms);
 
     var index = roo[roomID].players.findIndex(
@@ -194,8 +191,8 @@ io.on("connection", function(socket) {
     );
 
     if (!socket.username) {
-      socket.username = "anonymous" + roo[roomID].anonymousCounter;
-      roo[roomID].anonymousCounter++;
+      socket.username = "anonymous" + anonymousCounter;
+      anonymousCounter++;
       socket.emit("USERNAME", socket.username);
     } else {
       socket.emit("USERNAME", socket.username);
@@ -232,13 +229,14 @@ io.on("connection", function(socket) {
 
     socket.emit("NOTIFICATION", "");
     if (roo[roomID].flowCheck === 0) {
-      roo[roomID].flowCheck++;
+      roo[roomID].flowCheck = 1;
 
       for (i = 0; i < roo[roomID].players.length; i++) {
         roo[roomID].players[i].leader = false;
       }
       roo[roomID].players[roo[roomID].leaderCounter].leader = true;
-      io.to(rooms).emit("ROOM_PLAYERS", roo[roomID].players);
+      io.to(rooms[1]).emit("ROOM_PLAYERS", roo[roomID].players);
+
       if (roo[roomID].leaderCounter === roo[roomID].players.length - 1) {
         roo[roomID].leaderCounter = 0;
       } else {
@@ -275,68 +273,84 @@ io.on("connection", function(socket) {
   socket.on("SUBMIT_ANSWER", function(data) {
     let rooms = Object.keys(socket.rooms);
     let roomID = roo.findIndex(p => p.name === rooms[1]);
-    roo[roomID].submittedAnswer.push({
-      socketval: socket.id,
-      answer: data.answer
-    });
-    roo[roomID].submittedString.push(data.answer);
 
-    for (i = 0; i < roo[roomID].players.length; i++) {
-      if (socket.id === roo[roomID].players[i].connectionSocket) {
-        roo[roomID].players[i].cards.splice(
-          roo[roomID].players[i].cards.findIndex(id => id === data.answer),
-          1
-        );
-      }
-      io.to(roo[roomID].players[i].connectionSocket).emit("CARDS", {
-        cards: roo[roomID].players[i].cards,
-        leader: roo[roomID].players[i].leader
+    if (roo[roomID].flowCheck === 1) {
+      roo[roomID].submittedAnswer.push({
+        socketval: socket.id,
+        answer: data.answer
       });
-    }
+      roo[roomID].submittedString.push(data.answer);
 
-    if (roo[roomID].submittedAnswer.length == roo[roomID].players.length - 1) {
-      io.to(rooms[1]).emit("SHOW_RESULT", roo[roomID].submittedString);
-    } else {
+      for (i = 0; i < roo[roomID].players.length; i++) {
+        if (socket.id === roo[roomID].players[i].connectionSocket) {
+          roo[roomID].players[i].cards.splice(
+            roo[roomID].players[i].cards.findIndex(id => id === data.answer),
+            1
+          );
+        }
+        io.to(roo[roomID].players[i].connectionSocket).emit("CARDS", {
+          cards: roo[roomID].players[i].cards,
+          leader: roo[roomID].players[i].leader
+        });
+      }
+
+      if (
+        roo[roomID].submittedAnswer.length ==
+        roo[roomID].players.length - 1
+      ) {
+        roo[roomID].flowCheck = 2;
+        io.to(rooms[1]).emit("SHOW_RESULT", roo[roomID].submittedString);
+      }
     }
   });
   socket.on("SUBMIT_VOTE", function(data) {
     let rooms = Object.keys(socket.rooms);
     let roomID = roo.findIndex(p => p.name === rooms[1]);
-    for (i = 0; i < roo[roomID].submittedAnswer.length; i++) {
-      if (roo[roomID].submittedAnswer[i].answer === data.vote) {
-        for (n = 0; n < roo[roomID].players.length; n++) {
-          if (
-            roo[roomID].submittedAnswer[i].socketval ===
-            roo[roomID].players[n].connectionSocket
-          ) {
-            roo[roomID].players[n].score++;
+    let socketID = roo[roomID].players.findIndex(
+      p => p.connectionSocket === socket.id
+    );
+
+    let leaderID = roo[roomID].players.findIndex(p => p.leader === true);
+
+    if (roo[roomID].flowCheck === 2 && socketID === leaderID) {
+      for (i = 0; i < roo[roomID].submittedAnswer.length; i++) {
+        if (roo[roomID].submittedAnswer[i].answer === data.vote) {
+          for (n = 0; n < roo[roomID].players.length; n++) {
+            if (
+              roo[roomID].submittedAnswer[i].socketval ===
+              roo[roomID].players[n].connectionSocket
+            ) {
+              roo[roomID].players[n].score++;
+            }
           }
         }
       }
-    }
 
-    io.to(rooms[1]).emit("ROOM_PLAYERS", roo[roomID].players);
-    roo[roomID].flowCheck = 0;
+      io.to(rooms[1]).emit("ROOM_PLAYERS", roo[roomID].players);
+      roo[roomID].flowCheck = 0;
+    }
   });
   socket.on("disconnect", function() {
     let rooms = Object.keys(socket.rooms);
     let roomID = roo.findIndex(p => p.name === rooms[1]);
+
     numUsers--;
 
     userArray.splice(
       userArray.findIndex(id => id === socket.id),
       1
     );
-
-    if (
-      roo[roomID].players.findIndex(id => id.connectionSocket == socket.id) >= 0
-    ) {
-      roo[roomID].players.splice(
-        roo[roomID].players.findIndex(id => id.connectionSocket == socket.id),
-        1
-      );
+    for (i = 0; i < roo.length; i++) {
+      if (
+        roo[i].players.findIndex(id => id.connectionSocket == socket.id) >= 0
+      ) {
+        roo[i].players.splice(
+          roo[i].players.findIndex(id => id.connectionSocket == socket.id),
+          1
+        );
+      }
+      io.to(roo[i].name).emit("ROOM_PLAYERS", roo[i].players);
     }
-    io.to(rooms[1]).emit("ROOM_PLAYERS", roo[roomID].players);
   });
 });
 

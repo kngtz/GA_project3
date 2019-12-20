@@ -15,26 +15,19 @@ class Header extends React.Component {
     };
   }
   componentDidMount() {
-    console.log("hellooo", this.props.socket)
     // this.props.socket = io("localhost:3000");
 
     this.props.socket.on("QUESTION", question => {
       this.setState({ question: question });
     });
     this.props.socket.on("CLEAR_RESULT", data => {
-      console.log("ENTERED");
-      console.log(data.submittedAnswer);
       this.setState({ answers: data.submittedAnswer });
     });
     this.props.socket.on("SHOW_RESULT", data => {
-      console.log("ENTEererRED");
-      console.log(data);
       this.setState({ answers: data });
     });
   }
   render() {
-   
-    console.log("hellooo", this.state.question)
     return <h1> {this.state.question} </h1>;
   }
 }
@@ -91,7 +84,6 @@ class ChatBox extends React.Component {
       this.addMessage(data);
     });
     this.props.socket.on("USERNAME", username => {
-      console.log("hello");
       this.setState({ username: username });
     });
   }
@@ -169,6 +161,8 @@ class ScoreBoard extends React.Component {
     // });
 
     this.props.socket.on("ROOM_PLAYERS", players => {
+      console.log("THIS is the client" + players[0].leader);
+
       this.setState({ players: players });
     });
   }
@@ -306,20 +300,15 @@ class GameArea extends React.Component {
       this.setState({ question: question });
     });
     this.props.socket.on("CLEAR_RESULT", data => {
-      console.log("ENTERED");
-      console.log(data.submittedAnswer);
       this.setState({ answers: data.submittedAnswer });
     });
     this.props.socket.on("SHOW_RESULT", data => {
-      console.log("ENTEererRED");
-      console.log(data);
       this.setState({ answers: data });
     });
   }
 
   selectCard = answer => {
     this.setState({ vote: answer });
-    console.log(this.state.vote);
   };
 
   submitVote = () => {
@@ -332,14 +321,6 @@ class GameArea extends React.Component {
     return (
       <div class="row">
         <div class="col-8">
-          <div className="card">
-            <div className="card-body">
-              <div className="card-title">
-                <h3>Question: </h3>
-                <p>{this.state.question}</p>
-              </div>
-            </div>
-          </div>
           <hr />
           <div className="card">
             <div className="card-body">
@@ -485,7 +466,7 @@ class App extends React.Component {
             <div class="container">
               <div class="row">
                 <div class="col-12">
-                  <Header socket={socket}/>
+                  <Header socket={socket} />
                 </div>
               </div>
               <div class="row">
