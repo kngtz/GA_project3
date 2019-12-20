@@ -276,6 +276,51 @@ class SubmitUser extends React.Component {
               Join Room 2
             </Link>
           </form>
+          <form class="form-inline">
+            <Link
+              to="/room"
+              onClick={() => this.joinGame(3)}
+              className="btn btn-primary form-control"
+            >
+              Join Room 3
+            </Link>
+          </form>
+          <form class="form-inline">
+            <Link
+              to="/room"
+              onClick={() => this.joinGame(4)}
+              className="btn btn-primary form-control"
+            >
+              Join Room 4
+            </Link>
+          </form>
+          <form class="form-inline">
+            <Link
+              to="/room"
+              onClick={() => this.joinGame(5)}
+              className="btn btn-primary form-control"
+            >
+              Join Room 5
+            </Link>
+          </form>
+          <form class="form-inline">
+            <Link
+              to="/room"
+              onClick={() => this.joinGame(6)}
+              className="btn btn-primary form-control"
+            >
+              Join Room 6
+            </Link>
+          </form>
+          <form class="form-inline">
+            <Link
+              to="/room"
+              onClick={() => this.joinGame(7)}
+              className="btn btn-primary form-control"
+            >
+              Join Room 7
+            </Link>
+          </form>
         </nav>
       </div>
     );
