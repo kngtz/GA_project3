@@ -55,7 +55,7 @@ const questions = [
     pick: 1
   },
   {
-    text: "What's the next Happy Meal&reg; toy?",
+    text: "What's the next Happy Meal toy?",
     pick: 1
   },
   {
@@ -248,14 +248,6 @@ const questions = [
     pick: 1
   },
   {
-    text: "And the Academy Award for _ goes to _.",
-    pick: 2
-  },
-  {
-    text: "For my next trick, I will pull _ out of _.",
-    pick: 2
-  },
-  {
     text: "_: Good to the last drop.",
     pick: 1
   },
@@ -272,50 +264,25 @@ const questions = [
     pick: 1
   },
   {
-    text: "I never truly understood _ until I encountered _.",
-    pick: 2
+    text: "I never truly understood living until I encountered _.",
+    pick: 1
   },
   {
     text:
-      "Rumor has it that Vladimir Putin's favorite delicacy is _ stuffed with _.",
-    pick: 2
+      "Rumor has it that Vladimir Putin's favorite delicacy is stuffed with _.",
+    pick: 1
   },
   {
-    text: "Lifetime&reg; presents _, the story of _.",
-    pick: 2
+    text: "That's right, I killed you. How, you ask? _.",
+    pick: 1
   },
   {
-    text: "Make a haiku.",
-    pick: 3
+    text: "When I was tripping on acid, I turned into _.",
+    pick: 1
   },
   {
-    text:
-      "In M. Night Shyamalan's new movie, Bruce Willis discovers that _ had really been _ all along.",
-    pick: 2
-  },
-  {
-    text: "_ is a slippery slope that leads to _.",
-    pick: 2
-  },
-  {
-    text: "In a world ravaged by _, our only solace is _.",
-    pick: 2
-  },
-  {
-    text: "That's right, I killed _. How, you ask? _.",
-    pick: 2
-  },
-  {
-    text: "When I was tripping on acid, _ turned into _.",
-    pick: 2
-  },
-  {
-    text: "_ + _ = _.",
-    pick: 3
-  },
-  {
-    text: "What's the next superhero/sidekick duo?",
-    pick: 2
+    text: "What's the next superhero?",
+    pick: 1
   },
   {
     text:
@@ -344,10 +311,6 @@ const questions = [
     pick: 1
   },
   {
-    text: "Step 1: _. Step 2: _. Step 3: Profit.",
-    pick: 2
-  },
-  {
     text:
       "Here is the church. Here is the steeple. Open the doors. And there is _.",
     pick: 1
@@ -358,7 +321,7 @@ const questions = [
   },
   {
     text:
-      "During his childhood, Salvador Dal&iacute; produced hundreds of paintings of _.",
+      "During his childhood, Salvador Dalí produced hundreds of paintings of _.",
     pick: 1
   },
   {
@@ -377,6 +340,117 @@ const questions = [
   },
   {
     text: "Daddy, why is Mommy crying?",
+    pick: 1
+  },
+  {
+    text:
+      "And I would have gotten away with it, too, if it hadn't been for ______!",
+    pick: 1
+  },
+  {
+    text: "Awww, sick! I just saw this skater do a 720 kickflip into ______!",
+    pick: 1
+  },
+  {
+    text:
+      "Doctor, you've gone too far! The human body wasn't meant to withstand that amount of ______!",
+    pick: 1
+  },
+  {
+    text:
+      "Future historians will agree that ______ marked the beginning of America's decline.",
+    pick: 1
+  },
+  {
+    text: "He who controls ______ controls the world.",
+    pick: 1
+  },
+  {
+    text:
+      "I learned the hard way that you can't cheer up a grieving friend with ______.",
+    pick: 1
+  },
+  {
+    text:
+      "In his new self-produced album, Kanye West raps over the sounds of ______.",
+    pick: 1
+  },
+  {
+    text:
+      "In its new tourism campaign, Detroit proudly proclaims that it has finally eliminated ______.",
+    pick: 1
+  },
+  {
+    text:
+      "In Rome, there are whisperings that the Vatican has a secret room devoted to ______.",
+    pick: 1
+  },
+  {
+    text:
+      "In the distant future, historians will agree that ______ marked the beginning of America's decline.",
+    pick: 1
+  },
+
+  {
+    text: "My plan for world domination begins with ______.",
+    pick: 1
+  },
+  {
+    text:
+      "Next season on Man vs, Wild, Bear Grylls must survive the depths of the Amazon with only ______ and his wits.",
+    pick: 1
+  },
+  {
+    text:
+      "Next week on Discovery Channel, one man must survive in the depths of the Amazon with only _____ and his wits.",
+    pick: 1
+  },
+  {
+    text: "Science will never explain ______.",
+    pick: 1
+  },
+  {
+    text: "Science will never explain the origin of ______.",
+    pick: 1
+  },
+  {
+    text:
+      "The CIA now interrogates enemy agents by repeatedly subjecting them to ______.",
+    pick: 1
+  },
+  {
+    text:
+      "The secret to a lasting marriage is communication, communication, and ______.",
+    pick: 1
+  },
+  {
+    text:
+      "The socialist governments of Scandinavia have declared that access to ______ is a basic human right.",
+    pick: 1
+  },
+  {
+    text:
+      "This season on Man vs. Wild, Bear Grylls must survive in the depths of the Amazon with only ______ and his wits.",
+    pick: 1
+  },
+  {
+    text: "What brought the orgy to a grinding halt?",
+    pick: 1
+  },
+  {
+    text: "What has been making life difficult at the nudist colony?",
+    pick: 1
+  },
+  {
+    text: "What's the gift that keeps on giving?",
+    pick: 1
+  },
+  {
+    text: "When all else fails, I can always masturbate to ______.",
+    pick: 1
+  },
+  {
+    text: "When I pooped, what came out of my butt?",
     pick: 1
   }
 ];

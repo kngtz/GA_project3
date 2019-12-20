@@ -338,12 +338,15 @@ class GameArea extends React.Component {
       username: "",
       question: "",
       vote: "",
-      answers: []
+      answers: [],
+      leader: ""
     };
   }
   componentDidMount() {
     // this.props.socket = io("localhost:3000");
-
+    this.props.socket.on("CARDS", players => {
+      this.setState({ leader: players.leader });
+    });
     this.props.socket.on("QUESTION", question => {
       this.setState({ question: question });
     });
@@ -373,22 +376,44 @@ class GameArea extends React.Component {
           <div className="card-title player-array">
             {this.state.answers.map(answer => {
               return (
-                <div
-                  className={`player-card card-body btn btn-outline-light pointer bold py-3 ${
-                    answer === this.state.vote ? "bg-white text-dark" : ""
-                  }`}
-                  onClick={() => this.selectCard(answer)}
-                >
-                  <p>{answer}</p>
+                // <div
+                //   className={`player-card card-body btn btn-outline-light pointer bold py-3 ${
+                //     answer === this.state.vote ? "bg-white text-dark" : ""
+                //   }`}
+                //   onClick={() => this.selectCard(answer)}
+                // >
+                //   <p>{answer}</p>
+                // </div>
+                <div>
+                  {this.state.leader ? (
+                    <div
+                      className={`player-card card-body btn btn-outline-light pointer bold py-3 ${
+                        answer === this.state.vote ? "bg-white text-dark" : ""
+                      }`}
+                      onClick={() => this.selectCard(answer)}
+                    >
+                      <p>{answer}</p>
+                    </div>
+                  ) : (
+                    <div
+                      className={`player-card card-body btn btn-outline-light pointer bold py-3`}
+                    >
+                      <p>{answer}</p>
+                    </div>
+                  )}
                 </div>
               );
             })}
-            <button
-              className="btn btn-dark form-control"
-              onClick={() => this.submitVote()}
-            >
-              Submit Vote
-            </button>
+            {this.state.leader ? (
+              <button
+                className="btn btn-dark form-control"
+                onClick={() => this.submitVote()}
+              >
+                Submit Vote
+              </button>
+            ) : (
+              ""
+            )}
           </div>
         </div>
       </div>
@@ -474,12 +499,16 @@ class PlayerHand extends React.Component {
               );
             })}
           </div>
-          <button
-            className="btn btn-dark form-control"
-            onClick={() => this.submitCard()}
-          >
-            Submit Answer
-          </button>
+          {this.state.leader ? (
+            ""
+          ) : (
+            <button
+              className="btn btn-dark form-control"
+              onClick={() => this.submitCard()}
+            >
+              Submit Answer
+            </button>
+          )}
         </div>
       </div>
     );
