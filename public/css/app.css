@@ -22,8 +22,8 @@ body {
 }
 
 h1 {
-  background: var(--myrtle-green);
-  color: var(--moonstone-blue);
+  background: black;
+  color: white;
   margin-top: 0;
   text-align: center;
   padding: 1em;
