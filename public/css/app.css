@@ -109,3 +109,15 @@ table {
   width: 250px;
   height: 150px;
 }
+
+#landing-header {
+  padding-top: 40vh;
+  position: relative;
+  text-align: center;
+  z-index: 1;
+}
+
+#landing-header h1 {
+  color: white;
+  margin: 0.5em auto;
+}

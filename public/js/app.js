@@ -540,10 +540,16 @@ class App extends React.Component {
       <BrowserRouter>
         <Switch>
           <Route exact path="/">
+            
+            <div id="landing-header">
             <h1>CARDS AGAINST HUMANITY</h1>
+            <h6><strike>Card Against Humanity is a party game for horrible people. A game as despicable and awkward as you and your friends.</strike></h6>
+            <h6>The game is simple. Each round, one player asks a question from a black card, and everyone answers with their funniest card.</h6>
+
             <div class="row">
               <div class="col-12">
                 <SubmitUser socket={socket} />
+              </div>
               </div>
             </div>
           </Route>
